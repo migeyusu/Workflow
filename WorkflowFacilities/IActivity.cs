@@ -12,5 +12,7 @@ namespace WorkflowFacilities
         /// 唯一标记，版本号
         /// </summary>
         Guid Version { get; set; }
+
+        string Name { get;set; }
     }
 }

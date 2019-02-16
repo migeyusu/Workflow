@@ -1,6 +1,6 @@
 ﻿using System.Data.Entity;
 
-namespace WorkflowFacilities
+namespace WorkflowFacilities.Persistent
 {
     public class WorkflowDbContext:DbContext
     {

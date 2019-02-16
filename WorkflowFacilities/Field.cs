@@ -1,4 +1,6 @@
 ﻿using System;
+using WorkflowFacilities.Consumer;
+using WorkflowFacilities.Running;
 
 namespace WorkflowFacilities
 {

@@ -1,4 +1,4 @@
-﻿namespace WorkflowFacilities
+﻿namespace WorkflowFacilities.Persistent
 {
     public class StateMachineModel
     {

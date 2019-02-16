@@ -11,7 +11,9 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            
+            var myClass1 = new MyClass1();
+            Console.WriteLine(myClass1.S);
+            Console.WriteLine(string.IsNullOrEmpty(myClass1.S1));
             Console.ReadKey();
         }
 
@@ -19,7 +21,24 @@ namespace ConsoleApp1
         
     }
 
+    class MyClass
+    {
+        public string S { get; set; }
 
-    
+        public string S1 { get; set; }
+        public MyClass()
+        {
+            S = "d";
+            S1 = "dsfgd";
+        }
+    }
+
+    class MyClass1:MyClass
+    {
+        public MyClass1():base()
+        {
+            S = "22";
+        }
+    }
 
 }

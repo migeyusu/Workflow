@@ -1,9 +1,11 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace WorkflowFacilities
+namespace WorkflowFacilities.Consumer
 {
+    /// <summary>
+    /// state是一类更高级的activity
+    /// </summary>
     public class State:IActivity
     {
         public ICustomActivity Entry { get; set; }
@@ -13,7 +15,7 @@ namespace WorkflowFacilities
         public List<Transition> Transitions { get; set; }
 
         public Guid Version { get; set; }
-
+        
         public string Name { get; set; }
 
         public bool IsEndState => this.Transitions.Count == 0;
@@ -23,4 +25,5 @@ namespace WorkflowFacilities
             Transitions=new List<Transition>();
         }
     }
+
 }

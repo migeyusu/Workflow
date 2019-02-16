@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace WorkflowFacilities
+namespace WorkflowFacilities.Consumer
 {
     public class TransitionPath
     {
