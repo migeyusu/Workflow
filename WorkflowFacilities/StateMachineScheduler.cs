@@ -1,4 +1,5 @@
-﻿using System.Runtime.ExceptionServices;
+﻿using System.Collections.Generic;
+using System.Runtime.ExceptionServices;
 using WorkflowFacilities.Consumer;
 using WorkflowFacilities.Running;
 
@@ -9,21 +10,54 @@ namespace WorkflowFacilities
         /*
          * 翻译成可执行的activity
          */
-        public void Run(StateMachine stateMachine)
-        { }
+        public void Run(StateMachine stateMachine) { }
 
-        private void Translate(State state, IExecuteActivity activity)
+        /// <summary>
+        /// 状态列表，映射入口activity
+        /// </summary>
+        private Dictionary<State, IExecuteActivity> _activitiesDictionary;
+        
+        private void Translate(State state, IExecuteActivity executeActivity)
         {
+            var activity = executeActivity;
             var stateEmptyExecuteActivity = new StateEmptyExecuteActivity {ParentActivity = state};
+            _activitiesDictionary.Add(state, stateEmptyExecuteActivity);
             activity.NextActivities.Add(stateEmptyExecuteActivity);
             activity = stateEmptyExecuteActivity;
             var entry = state.Entry;
             if (entry != null) {
-                var baseExecuteActivity = new CustomExecuteActivity(entry.Execute, entry.BookmarkCallback) {
+                var customExecuteActivity = new CustomExecuteActivity(entry.Execute, entry.BookmarkCallback) {
                     Version = entry.Version,
                     Bookmark = entry.Bookmark,
-                    Name = 
+                    Name = entry.Name,
                 };
+                activity.NextActivities.Add(customExecuteActivity);
+                activity = customExecuteActivity;
+            }
+
+            var exit = state.Exit;
+            if (exit != null) {
+                var customExecuteActivity = new CustomExecuteActivity(exit.Execute, exit.BookmarkCallback) {
+                    Version = exit.Version,
+                    Bookmark = exit.Bookmark,
+                    Name = exit.Name
+                };
+                activity.NextActivities.Add(customExecuteActivity);
+                activity = customExecuteActivity;
+            }
+            
+            //transition
+            foreach (var transition in state.Transitions) {
+                var transitionTrigger = transition.Trigger;
+                var customExecuteActivity = new CustomExecuteActivity(transitionTrigger.Execute,transitionTrigger.BookmarkCallback) {
+                    Version = transitionTrigger.Version,
+                    Bookmark = transitionTrigger.Bookmark,
+                    Name = transitionTrigger.Name,
+                };
+                activity.NextActivities.Add(customExecuteActivity);
+                foreach (var path in transition.TransitionPaths) {
+                    
+                }
             }
         }
 

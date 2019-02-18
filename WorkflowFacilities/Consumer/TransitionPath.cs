@@ -4,7 +4,7 @@ namespace WorkflowFacilities.Consumer
 {
     public class TransitionPath
     {
-        public ICustomActivity To { get; set; }
+        public State To { get; set; }
 
         public ICustomActivity Aciton { get; set; }
 
