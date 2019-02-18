@@ -8,7 +8,5 @@ namespace WorkflowFacilities.Running
         /// 表示是否被挂起
         /// </summary>
         bool IsHangUped { get; set; }
-
-        bool Executed { get; set; }
     }
 }

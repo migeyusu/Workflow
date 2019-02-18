@@ -48,22 +48,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Consumer\StateMachine.cs" />
     <Compile Include="Running\BaseExecuteActivity.cs" />
+    <Compile Include="Running\ConditionActivity.cs" />
+    <Compile Include="Running\CustomExecuteActivity.cs" />
     <Compile Include="Running\IExecutable.cs" />
     <Compile Include="Running\IExecuteActivity.cs" />
-    <Compile Include="Persistent\ActivityModel.cs" />
+    <Compile Include="Persistent\RunningActivityModel.cs" />
     <Compile Include="Configuration.cs" />
-    <Compile Include="Field.cs" />
+    <Compile Include="Persistent\Field.cs" />
     <Compile Include="IActivity.cs" />
     <Compile Include="Consumer\ICustomActivity.cs" />
     <Compile Include="Running\IRunningModel.cs" />
     <Compile Include="Running\PipelineContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Consumer\State.cs" />
-    <Compile Include="Consumer\StateMachine.cs" />
+    <Compile Include="Consumer\StateMachineTemplate.cs" />
     <Compile Include="Persistent\StateMachineModel.cs" />
     <Compile Include="Persistent\StateModel.cs" />
-    <Compile Include="StateMachineScheduler.cs" />
+    <Compile Include="Running\StartActiviy.cs" />
+    <Compile Include="Running\StateEmptyExecuteActivity.cs" />
+    <Compile Include="Running\StateMachineScheduler.cs" />
     <Compile Include="Consumer\Transition.cs" />
     <Compile Include="Persistent\TransitionModel.cs" />
     <Compile Include="Consumer\TransitionPath.cs" />

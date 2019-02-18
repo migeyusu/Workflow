@@ -1,4 +1,6 @@
-﻿namespace WorkflowFacilities
+﻿using WorkflowFacilities.Persistent;
+
+namespace WorkflowFacilities
 {
     public class WorkflowFact
     {
