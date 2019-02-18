@@ -10,4 +10,4 @@ namespace WorkflowFacilities.Persistent
 
         public bool IsHangUped { get; set; }
     }
-}
+}   

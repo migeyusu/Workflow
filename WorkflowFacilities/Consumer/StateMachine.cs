@@ -2,43 +2,35 @@
 
 namespace WorkflowFacilities.Consumer
 {
-    public abstract class StateMachine
+
+    /// <summary>
+    /// statemachinetemplate的实例，run并保持各种状态
+    /// </summary>
+    public class StateMachine
     {
-        private PipelineContext pipelineContext = new PipelineContext();
+        private PipelineContext _pipelineContext = new PipelineContext();
         
         /// <summary>
         /// 开始时表示入口状态
         /// </summary>
-        public State CurrentState { get; set; }
-
+        public IExecuteActivity CurrentActivity { get; set; }
+        
         public bool IsCompleted { get; set; }
 
-        protected StateMachine()
+        public State StartState { get; set; }
+
+        public PipelineContext Context {
+            get { return _pipelineContext; }
+            set { _pipelineContext = value; }
+        }
+        
+        internal StateMachine()
         {
             
         }
 
-        public void Run()
-        {
-            if (CurrentState.Entry.IsHangUped) {
-                
-            }
-        }
+        
 
-        private void InternalRun(State state)
-        {
-            
-            if (state.IsEndState) {
-                IsCompleted = true;
-            }
-            if (state.Entry.IsHangUped) {
-                return;
-            }
-
-            if (state.Exit.IsHangUped) {
-                return;
-            }
-        }
 
         public void ResumeBookMark(string name,string value)
         {

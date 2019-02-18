@@ -11,6 +11,8 @@ namespace WorkflowFacilities.Running
     /// </summary>
     public class PipelineContext
     {
+        public string CurrentStateName { get; internal set; }
+
         private ConcurrentDictionary<string, string> _localVariableDictionary =
             new ConcurrentDictionary<string, string>();
 
@@ -19,13 +21,12 @@ namespace WorkflowFacilities.Running
             set { _localVariableDictionary = value; }
         }
 
-        public List<string> WaitingForBookmarkList {
+        public Dictionary<string,IExecuteActivity> WaitingForBookmarkList {
             get { return _waitingForBookmarkList; }
             set { _waitingForBookmarkList = value; }
         }
-
-        private List<string> _waitingForBookmarkList = new List<string>();
-
+        
+        private Dictionary<string,IExecuteActivity> _waitingForBookmarkList = new Dictionary<string, IExecuteActivity>();
 
         public void Set(string name, string value)
         {
@@ -40,7 +41,7 @@ namespace WorkflowFacilities.Running
         private void InternalRequestHangUp(IExecuteActivity activity)
         {
             activity.IsHangUped = true;
-            _waitingForBookmarkList.Add(activity.Bookmark);
+            _waitingForBookmarkList.Add(activity.Bookmark,activity);
         }
 
         /// <summary>

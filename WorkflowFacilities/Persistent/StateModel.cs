@@ -10,9 +10,9 @@ namespace WorkflowFacilities.Persistent
 
         public string Name { get; set; }
 
-        public ActivityModel Entry { get; set; }
+        public RunningActivityModel Entry { get; set; }
 
-        public ActivityModel Exit { get; set; }
+        public RunningActivityModel Exit { get; set; }
 
         public Transition Type { get; set; }
 

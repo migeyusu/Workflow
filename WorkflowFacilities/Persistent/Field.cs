@@ -1,12 +1,10 @@
 ﻿using System;
 using WorkflowFacilities.Consumer;
-using WorkflowFacilities.Running;
 
-namespace WorkflowFacilities
+namespace WorkflowFacilities.Persistent
 {
     public class Field:IDisposable
     {
-        
         public  T Get<T>() where T:StateMachine
         {
 

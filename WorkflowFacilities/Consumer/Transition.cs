@@ -10,14 +10,15 @@ namespace WorkflowFacilities.Consumer
     {
         public List<TransitionPath> TransitionPaths { get; set; }
 
+        /// <summary>
+        /// template生成时使用固定guid
+        /// </summary>
         public Guid Version { get; set; }
 
         public string Name { get; set; }
-
+        
         public bool IsHangUped { get; set; }
 
         public ICustomActivity Trigger { get; set; }
-
-        
     }
 }
