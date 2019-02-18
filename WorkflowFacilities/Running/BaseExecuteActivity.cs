@@ -26,7 +26,7 @@ namespace WorkflowFacilities.Running
             return true;
         }
 
-        public virtual void BookmarkCallback(PipelineContext context, object value)
+        public virtual void BookmarkCallback(PipelineContext context)
         {
             throw new NotImplementedException();
         }

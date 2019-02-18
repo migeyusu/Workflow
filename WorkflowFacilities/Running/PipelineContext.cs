@@ -13,35 +13,30 @@ namespace WorkflowFacilities.Running
     {
         public string CurrentStateName { get; internal set; }
 
-        private ConcurrentDictionary<string, string> _localVariableDictionary =
+        public bool IsCompleted { get; set; }
+
+        public KeyValuePair<string,object> ResumingBookmark { get; set; }
+
+        public ConcurrentDictionary<string, string> LocalVariableDictionary { get; set; } =
             new ConcurrentDictionary<string, string>();
 
-        public ConcurrentDictionary<string, string> LocalVariableDictionary {
-            get { return _localVariableDictionary; }
-            set { _localVariableDictionary = value; }
-        }
-
-        public Dictionary<string,IExecuteActivity> WaitingForBookmarkList {
-            get { return _waitingForBookmarkList; }
-            set { _waitingForBookmarkList = value; }
-        }
-        
-        private Dictionary<string,IExecuteActivity> _waitingForBookmarkList = new Dictionary<string, IExecuteActivity>();
+        public Dictionary<string, IExecuteActivity> WaitingForBookmarkList { get; set; } =
+            new Dictionary<string, IExecuteActivity>();
 
         public void Set(string name, string value)
         {
-            _localVariableDictionary.AddOrUpdate(name, s => value, (s, s1) => value);
+            LocalVariableDictionary.AddOrUpdate(name, s => value, (s, s1) => value);
         }
 
         public string Get(string name)
         {
-            return _localVariableDictionary.TryGetValue(name, out var value) ? value : string.Empty;
+            return LocalVariableDictionary.TryGetValue(name, out var value) ? value : string.Empty;
         }
 
         private void InternalRequestHangUp(IExecuteActivity activity)
         {
             activity.IsHangUped = true;
-            _waitingForBookmarkList.Add(activity.Bookmark,activity);
+            WaitingForBookmarkList.Add(activity.Bookmark, activity);
         }
 
         /// <summary>

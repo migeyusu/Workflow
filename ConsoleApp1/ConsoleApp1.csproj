@@ -60,11 +60,5 @@
   <ItemGroup>
     <Folder Include="Workflow\" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\WorkflowFacilities\WorkflowFacilities.csproj">
-      <Project>{1f952863-d6b3-4640-85c9-57feb1a1d2c9}</Project>
-      <Name>WorkflowFacilities</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

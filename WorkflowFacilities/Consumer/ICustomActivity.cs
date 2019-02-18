@@ -16,6 +16,6 @@ namespace WorkflowFacilities.Consumer
         /// <returns></returns>
         bool Execute(PipelineContext context);
 
-        void BookmarkCallback(PipelineContext context, object value);
+        void BookmarkCallback(PipelineContext context);
     }
 }

@@ -9,10 +9,10 @@ namespace WorkflowFacilities.Running
     {
         private readonly Func<PipelineContext, bool> _executeFunc;
 
-        private readonly Action<PipelineContext, object> _callbackAction;
+        private readonly Action<PipelineContext> _callbackAction;
         
         public CustomExecuteActivity(Func<PipelineContext, bool> executeFunc,
-            Action<PipelineContext, object> callbackAction):base()
+            Action<PipelineContext> callbackAction):base()
         {
             this._executeFunc = executeFunc;
             this._callbackAction = callbackAction;
@@ -24,9 +24,9 @@ namespace WorkflowFacilities.Running
             return _executeFunc == null || _executeFunc(context);
         }
 
-        public override void BookmarkCallback(PipelineContext context, object value)
+        public override void BookmarkCallback(PipelineContext context)
         {
-            _callbackAction?.Invoke(context, value);
+            _callbackAction?.Invoke(context);
         }
     }
 }
