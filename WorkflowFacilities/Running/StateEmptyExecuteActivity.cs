@@ -9,7 +9,8 @@ namespace WorkflowFacilities.Running
     {
         public StateEmptyExecuteActivity() : base()
         {
-            this.Version = Guid.Parse("B4B4C3B6-D102-4F7E-B8B9-0367244EFF3B");
+            this.ActivityType = RunningActivityType.Start;
+            //this.Version = Guid.Parse("B4B4C3B6-D102-4F7E-B8B9-0367244EFF3B");
         }
 
         public override bool Execute(PipelineContext context)

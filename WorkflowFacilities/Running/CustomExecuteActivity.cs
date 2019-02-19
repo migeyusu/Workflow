@@ -16,7 +16,8 @@ namespace WorkflowFacilities.Running
         {
             this._executeFunc = executeFunc;
             this._callbackAction = callbackAction;
-            this.Version = Guid.Parse("D9D8EA85-AD19-476D-8FD3-1E3AA47B01B3");
+            this.ActivityType = RunningActivityType.Custom;
+            //this.Version = Guid.Parse("D9D8EA85-AD19-476D-8FD3-1E3AA47B01B3");
         }
         
         public override bool Execute(PipelineContext context)

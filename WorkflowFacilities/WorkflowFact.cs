@@ -1,4 +1,5 @@
-﻿using WorkflowFacilities.Persistent;
+﻿using System;
+using WorkflowFacilities.Persistent;
 
 namespace WorkflowFacilities
 {
@@ -10,7 +11,7 @@ namespace WorkflowFacilities
         /// <returns></returns>
         public Field OpenField()
         {
-
+            throw new NotImplementedException();
         }
     }
 }

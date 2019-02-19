@@ -8,7 +8,8 @@ namespace WorkflowFacilities.Running
     /// </summary>
     public interface IExecuteActivity : ICustomActivity,IExecutable
     {
-        IActivity ParentActivity { get; set; }
+        RunningActivityType ActivityType { get; set; }
+        //IActivity ParentActivity { get; set; }
         IList<IExecuteActivity> NextActivities { get; set; }
     }
 }

@@ -10,13 +10,14 @@ namespace WorkflowFacilities.Running
     {
         public Guid Version { get; set; }
 
+        public RunningActivityType ActivityType { get; set; }
+        
         public string Name { get; set; }
 
         public string Bookmark { get; set; }
 
         public BaseExecuteActivity()
         {
-            this.Version = Guid.Parse("22B34E74-3F49-4F3A-AE00-AE7BA4768D08");
             this.Name = "Base";
             NextActivities = new List<IExecuteActivity>();
         }
@@ -35,8 +36,16 @@ namespace WorkflowFacilities.Running
 
         public bool Executed { get; set; }
 
-        public IActivity ParentActivity { get; set; }
+        //public IActivity ParentActivity { get; set; }
 
         public IList<IExecuteActivity> NextActivities { get; set; }
     }
+
+    public enum RunningActivityType
+    {
+        Condition,
+        Custom,
+        Empty,
+        Start,
+    } 
 }

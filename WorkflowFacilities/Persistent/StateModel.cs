@@ -13,8 +13,8 @@ namespace WorkflowFacilities.Persistent
         public RunningActivityModel Entry { get; set; }
 
         public RunningActivityModel Exit { get; set; }
-
-        public Transition Type { get; set; }
+        
+        
 
     }
 }

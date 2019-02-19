@@ -7,7 +7,5 @@ namespace WorkflowFacilities.Persistent
         public Guid Id { get; set; }
 
         public RunningActivityModel Action { get; set; }
-
-        public TYPE Type { get; set; }
     }
 }

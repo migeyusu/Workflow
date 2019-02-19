@@ -7,6 +7,10 @@ namespace WorkflowFacilities.Consumer
      * 允许非继承新建使用delegation
      */
      
+    /// <summary>
+    /// empty transitionpath doesn't need to add into workflow transition collection
+    /// which has empty conditionfunc
+    /// </summary>
     public class TransitionPath:IActivity
     {
         public State To { get; set; }

@@ -18,5 +18,10 @@ namespace WorkflowFacilities.Consumer
         public string Name { get; set; }
 
         public ICustomActivity Trigger { get; set; }
+
+        public Transition()
+        {
+            TransitionPaths=new List<TransitionPath>();
+        }
     }
 }

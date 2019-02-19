@@ -7,11 +7,12 @@ namespace WorkflowFacilities.Persistent
     {
         
 
-        public  T Get<T>() where T:StateMachine
+        public StateMachine Get()
         {
-            
             var stateMachine = new StateMachine();
-            
+
+
+            return stateMachine;
         }
 
         public void Save()

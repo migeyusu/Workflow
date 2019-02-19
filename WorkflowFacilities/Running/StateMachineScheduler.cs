@@ -15,7 +15,7 @@ namespace WorkflowFacilities.Running
             var activitiesMapping = new Dictionary<State, IExecuteActivity>();
             var startActiviy = new StartActiviy();
             InternalTranslate(stateMachine.StartState, startActiviy, activitiesMapping);
-            stateMachine.CurrentActivity = startActiviy;
+            stateMachine.RunningExecuteActivityEntry = startActiviy;
             return startActiviy;
         }
 
@@ -24,7 +24,6 @@ namespace WorkflowFacilities.Running
         {
             var activity = executeActivity;
             var stateEmptyExecuteActivity = new StateEmptyExecuteActivity {
-                ParentActivity = state,
                 Name = state.Name
             };
             mapping.Add(state, stateEmptyExecuteActivity);
@@ -37,7 +36,6 @@ namespace WorkflowFacilities.Running
                     Version = entry.Version,
                     Bookmark = entry.Bookmark,
                     Name = entry.Name,
-                    ParentActivity = state
                 };
                 activity.NextActivities.Add(customExecuteActivity);
                 activity = customExecuteActivity;
@@ -50,7 +48,6 @@ namespace WorkflowFacilities.Running
                     Version = exit.Version,
                     Bookmark = exit.Bookmark,
                     Name = exit.Name,
-                    ParentActivity = state
                 };
                 activity.NextActivities.Add(customExecuteActivity);
                 activity = customExecuteActivity;
@@ -71,9 +68,13 @@ namespace WorkflowFacilities.Running
                 }
 
                 foreach (var path in transition.TransitionPaths) {
-                    var conditionActivity = new ConditionActivity(path.ConditionFunc);
-                    endActivity.NextActivities.Add(conditionActivity);
-                    IExecuteActivity pathactivity = conditionActivity;
+                    var pathConditionFunc = path.ConditionFunc;
+                    IExecuteActivity pathactivity = endActivity;
+                    if (pathConditionFunc!=null) {
+                        var conditionActivity = new ConditionActivity(pathConditionFunc);
+                        pathactivity.NextActivities.Add(conditionActivity);
+                        pathactivity = conditionActivity;
+                    }
                     var aciton = path.Aciton;
                     if (aciton != null) {
                         var customExecuteActivity = new CustomExecuteActivity(aciton.Execute,
@@ -102,12 +103,19 @@ namespace WorkflowFacilities.Running
         /// 运行初始化后的
         /// </summary>
         /// <param name="stateMachine"></param>
-        public void Run(StateMachine stateMachine)
+        /// <param name="param"></param>
+        public void Run(StateMachine stateMachine,IDictionary<string,string> param=null)
         {
             //first run
-            if (stateMachine.CurrentActivity == null) {
+            if (stateMachine.RunningExecuteActivityEntry == null) {
                 Translate(stateMachine);
-                InternalRun(stateMachine.CurrentActivity, stateMachine.Context);
+                if (param!=null) {
+                    foreach (var pair in param) {
+                        var stateMachineContext = stateMachine.Context;
+                        stateMachineContext.Set(pair.Key,pair.Value);
+                    }
+                }
+                InternalRun(stateMachine.RunningExecuteActivityEntry, stateMachine.Context);
             }
             else {
                 foreach (var executeActivity in stateMachine.Context.WaitingForBookmarkList.Values) {
@@ -131,7 +139,8 @@ namespace WorkflowFacilities.Running
                     return;
                 }
 
-                if (activity.IsHangUped) {
+                if (context.IsWaiting) {
+                    context.InternalRequestHangUp(activity);
                     return;
                 }
             }

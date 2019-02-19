@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
 using WorkflowFacilities.Consumer;
 
 namespace WorkflowFacilities.Running
@@ -13,14 +15,16 @@ namespace WorkflowFacilities.Running
     {
         public string CurrentStateName { get; internal set; }
 
-        public bool IsCompleted { get; set; }
+        public bool IsCompleted { get; internal set; }
 
-        public KeyValuePair<string,object> ResumingBookmark { get; set; }
+        public bool IsWaiting { get; set; }
 
-        public ConcurrentDictionary<string, string> LocalVariableDictionary { get; set; } =
+        public KeyValuePair<string,object> ResumingBookmark { get; internal set; }
+
+        internal ConcurrentDictionary<string, string> LocalVariableDictionary { get; set; } =
             new ConcurrentDictionary<string, string>();
 
-        public Dictionary<string, IExecuteActivity> WaitingForBookmarkList { get; set; } =
+        internal Dictionary<string, IExecuteActivity> WaitingForBookmarkList { get; set; } =
             new Dictionary<string, IExecuteActivity>();
 
         public void Set(string name, string value)
@@ -33,20 +37,19 @@ namespace WorkflowFacilities.Running
             return LocalVariableDictionary.TryGetValue(name, out var value) ? value : string.Empty;
         }
 
-        private void InternalRequestHangUp(IExecuteActivity activity)
+        internal void InternalRequestHangUp(IExecuteActivity activity)
         {
             activity.IsHangUped = true;
             WaitingForBookmarkList.Add(activity.Bookmark, activity);
         }
 
         /// <summary>
-        /// 挂起当前activity
+        /// 挂起当前activity,只允许单线程调用
         /// </summary>
         /// <param name="customActivity"></param>
-        public void WaitOn(ICustomActivity customActivity)
+        public void WaitOn()
         {
-            var executeActivity = customActivity as IExecuteActivity;
-            InternalRequestHangUp(executeActivity);
+            IsWaiting = true;
         }
     }
 }

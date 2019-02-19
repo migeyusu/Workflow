@@ -6,7 +6,8 @@ namespace WorkflowFacilities.Running
     {
         public StartActiviy():base()
         {
-            this.Version = Guid.Parse("5DF8A5E9-C16A-4054-9779-CBBE0F128B0D");
+            this.ActivityType = RunningActivityType.Start;
+            //this.Version = Guid.Parse("5DF8A5E9-C16A-4054-9779-CBBE0F128B0D");
         }
     }
 }
