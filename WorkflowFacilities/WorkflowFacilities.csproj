@@ -49,6 +49,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Consumer\StateMachine.cs" />
+    <Compile Include="Persistent\StateMachineTemplateModel.cs" />
+    <Compile Include="Persistent\TransitionPathModel.cs" />
     <Compile Include="Running\BaseExecuteActivity.cs" />
     <Compile Include="Running\ConditionActivity.cs" />
     <Compile Include="Running\CustomExecuteActivity.cs" />

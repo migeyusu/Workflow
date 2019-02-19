@@ -16,8 +16,6 @@ namespace WorkflowFacilities.Consumer
         public Guid Version { get; set; }
 
         public string Name { get; set; }
-        
-        public bool IsHangUped { get; set; }
 
         public ICustomActivity Trigger { get; set; }
     }

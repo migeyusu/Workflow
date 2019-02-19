@@ -7,6 +7,10 @@ namespace WorkflowFacilities.Consumer
     {
         public List<State> States { get; set; }
 
+        public List<Transition> Transitions { get; set; }
+
+        public List<TransitionPath> TransitionPaths { get; set; }
+        
         public State StartState { get; set; }    
         
         public StateMachine Create()
