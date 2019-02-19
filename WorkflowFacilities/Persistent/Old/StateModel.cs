@@ -4,6 +4,9 @@ using WorkflowFacilities.Running;
 
 namespace WorkflowFacilities.Persistent
 {
+    /*
+     * 暂时不用
+     */
     public class StateModel:IActivity
     {
         public Guid Version { get; set; }
@@ -13,8 +16,5 @@ namespace WorkflowFacilities.Persistent
         public RunningActivityModel Entry { get; set; }
 
         public RunningActivityModel Exit { get; set; }
-        
-        
-
     }
 }

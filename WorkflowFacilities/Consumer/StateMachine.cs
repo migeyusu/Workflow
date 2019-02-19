@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using WorkflowFacilities.Persistent;
@@ -56,6 +57,7 @@ namespace WorkflowFacilities.Consumer
                 StartActivityModel = startActivityModel,
                 Id = this.Id,
                 StateMachineTemplateVersion = Template.Version,
+                RunningActivityModels = allActivityModels.Values.ToList()
             };
             return stateMachineModel;
         }
@@ -64,27 +66,23 @@ namespace WorkflowFacilities.Consumer
         /// 将运行后的变化持久化到数据库
         /// </summary>
         /// <param name="stateMachineModel"></param>
-        internal void Store(StateMachineModel stateMachineModel)
+        internal void Update(StateMachineModel stateMachineModel)
         {
             stateMachineModel.CurrentStateName = this.Context.CurrentStateName;
             stateMachineModel.IsCompleted = this.Context.IsCompleted;
             var dictionary = this.Context.LocalVariableDictionary;
             var binaryFormatter = new BinaryFormatter();
             using (var memoryStream = new MemoryStream()) {
-             
-                binaryFormatter.Serialize(memoryStream,dictionary);
-                var s = Encoding.Unicode.GetString(memoryStream.ToArray());   
-
+                binaryFormatter.Serialize(memoryStream, dictionary);
+                stateMachineModel.LocalVariousDictionary = Encoding.Unicode.GetString(memoryStream.ToArray());
             }
-            
-            //stateMachineModel.LocalVariousDictionary
+            stateMachineModel.WaitingRunningActivityModels.Clear();
+            var runningActivityModels = stateMachineModel.RunningActivityModels;
+            var @select = this.Context.WaitingForBookmarkList.Values
+                .Select(activity => runningActivityModels.First(model => model.Id==activity.Id));
+            stateMachineModel.WaitingRunningActivityModels.AddRange(select);
         }
 
-        internal StateMachineModel Get()
-        {
-            throw new NotImplementedException();
-        }
-        
 
         private void Decorate(IExecuteActivity executeActivity, RunningActivityModel activityModel,
             Dictionary<Guid, RunningActivityModel> cache)

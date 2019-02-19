@@ -10,8 +10,9 @@ namespace WorkflowFacilities.Running
     {
         public Guid Version { get; set; }
 
+        public Guid Id { get; set; }
         public RunningActivityType ActivityType { get; set; }
-        
+
         public string Name { get; set; }
 
         public string Bookmark { get; set; }
@@ -47,5 +48,5 @@ namespace WorkflowFacilities.Running
         Custom,
         Empty,
         Start,
-    } 
+    }
 }

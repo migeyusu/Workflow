@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace WorkflowFacilities.Persistent
 {
+    /*
+     * 暂时不用
+     */
     public class StateMachineTemplateModel
     {
         public Guid Version { get; set; }

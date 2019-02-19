@@ -9,9 +9,9 @@ namespace WorkflowFacilities
         /// 访问的入口
         /// </summary>
         /// <returns></returns>
-        public Field OpenField()
+        public static Field OpenField(string constring)
         {
-            throw new NotImplementedException();
+            
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using WorkflowFacilities.Consumer;
 
 namespace WorkflowFacilities.Running
@@ -8,6 +9,7 @@ namespace WorkflowFacilities.Running
     /// </summary>
     public interface IExecuteActivity : ICustomActivity,IExecutable
     {
+        Guid Id { get; set; }
         RunningActivityType ActivityType { get; set; }
         //IActivity ParentActivity { get; set; }
         IList<IExecuteActivity> NextActivities { get; set; }
