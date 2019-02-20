@@ -5,11 +5,11 @@ namespace WorkflowFacilities.Running
     /// <summary>
     /// state的空activity，用于填充空state，每次state执行前执行，表示已经进入该state
     /// </summary>
-    public class StateEmptyExecuteActivity : BaseExecuteActivity
+    public class StateSetExecuteActivity : BaseExecuteActivity
     {
-        public StateEmptyExecuteActivity() : base()
+        public StateSetExecuteActivity() : base()
         {
-            this.ActivityType = RunningActivityType.Start;
+            this.ActivityType = RunningActivityType.Set;
             //this.Version = Guid.Parse("B4B4C3B6-D102-4F7E-B8B9-0367244EFF3B");
         }
 

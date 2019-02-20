@@ -16,27 +16,22 @@ namespace WorkflowFacilities.Consumer
     /// </summary>
     public class StateMachine
     {
+        public string Name { get; set; }
+
         /// <summary>
-        /// 运行activity链的起点
+        /// activity链
         /// </summary>
-        public IExecuteActivity RunningExecuteActivityEntry { get; set; }
+        public IExecuteActivity ExecuteActivityChainEntry { get; set; }
+
+        public bool IsCompleted => Context.IsCompleted;
+
+        public bool IsRunning => Context.IsRunning;
 
         public Guid Id { get; set; }
-
-        /// <summary>
-        /// state的起点
-        /// </summary>
-        public State StartState => Template.StartState;
 
         public StateMachineTemplate Template { get; set; }
 
         public PipelineContext Context { get; set; }
-
-        internal StateMachine()
-        {
-            this.Context = new PipelineContext();
-            this.Id = Guid.NewGuid();
-        }
 
         /// <summary>
         /// 映射到statemachine，第一次生成
@@ -44,29 +39,29 @@ namespace WorkflowFacilities.Consumer
         /// <returns></returns>
         internal StateMachineModel CreateStateMachineModel()
         {
-            if (RunningExecuteActivityEntry == null) {
+            if (ExecuteActivityChainEntry == null) {
                 //throw new NotSupportedException("should translate first");
                 var stateMachineScheduler = new StateMachineScheduler();
                 stateMachineScheduler.Translate(this);
             }
 
             var allActivityModels = new Dictionary<Guid, RunningActivityModel>();
-            var startActivityModel = new RunningActivityModel();
-            Decorate(RunningExecuteActivityEntry, startActivityModel, allActivityModels);
+            var startActivityModel = WorkflowFact.Serialize(ExecuteActivityChainEntry,allActivityModels);
             var stateMachineModel = new StateMachineModel {
                 StartActivityModel = startActivityModel,
                 Id = this.Id,
                 StateMachineTemplateVersion = Template.Version,
-                RunningActivityModels = allActivityModels.Values.ToList()
+                RunningActivityModels = allActivityModels.Values.ToList(),
+                Name = this.Name,
             };
             return stateMachineModel;
         }
 
         /// <summary>
-        /// 将运行后的变化持久化到数据库
+        /// 将运行后的变化映射
         /// </summary>
         /// <param name="stateMachineModel"></param>
-        internal void Update(StateMachineModel stateMachineModel)
+        internal void UpdateMap(StateMachineModel stateMachineModel)
         {
             stateMachineModel.CurrentStateName = this.Context.CurrentStateName;
             stateMachineModel.IsCompleted = this.Context.IsCompleted;
@@ -76,26 +71,12 @@ namespace WorkflowFacilities.Consumer
                 binaryFormatter.Serialize(memoryStream, dictionary);
                 stateMachineModel.LocalVariousDictionary = Encoding.Unicode.GetString(memoryStream.ToArray());
             }
-            stateMachineModel.WaitingRunningActivityModels.Clear();
+
+            stateMachineModel.SuspendedActivityModels.Clear();
             var runningActivityModels = stateMachineModel.RunningActivityModels;
-            var @select = this.Context.WaitingForBookmarkList.Values
-                .Select(activity => runningActivityModels.First(model => model.Id==activity.Id));
-            stateMachineModel.WaitingRunningActivityModels.AddRange(select);
-        }
-
-
-        private void Decorate(IExecuteActivity executeActivity, RunningActivityModel activityModel,
-            Dictionary<Guid, RunningActivityModel> cache)
-        {
-            cache.Add(activityModel.Id, activityModel);
-            activityModel.Version = executeActivity.Version;
-            activityModel.Name = executeActivity.Name;
-            activityModel.Bookmark = executeActivity.Bookmark;
-            foreach (var nextActivity in executeActivity.NextActivities) {
-                var runningActivityModel = new RunningActivityModel();
-                Decorate(nextActivity, runningActivityModel, cache);
-                activityModel.RunningActivityModels.Add(runningActivityModel);
-            }
+            var @select = this.Context.SuspendedActivities.Values
+                .Select(activity => runningActivityModels.First(model => model.Id == activity.Id));
+            stateMachineModel.SuspendedActivityModels.AddRange(select);
         }
     }
 }

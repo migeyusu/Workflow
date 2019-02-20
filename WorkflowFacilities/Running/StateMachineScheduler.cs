@@ -10,20 +10,19 @@ namespace WorkflowFacilities.Running
          * 翻译成可执行的activity
          */
 
-        public StartActiviy Translate(StateMachine stateMachine)
+        public StartActiviy Translate(StateMachineTemplate stateMachine)
         {
             var activitiesMapping = new Dictionary<State, IExecuteActivity>();
             var startActiviy = new StartActiviy();
             InternalTranslate(stateMachine.StartState, startActiviy, activitiesMapping);
-            stateMachine.RunningExecuteActivityEntry = startActiviy;
             return startActiviy;
         }
 
-        private void InternalTranslate(State state, IExecuteActivity executeActivity,
+        private static void InternalTranslate(State state, IExecuteActivity executeActivity,
             IDictionary<State, IExecuteActivity> mapping)
         {
             var activity = executeActivity;
-            var stateEmptyExecuteActivity = new StateEmptyExecuteActivity {
+            var stateEmptyExecuteActivity = new StateSetExecuteActivity {
                 Name = state.Name
             };
             mapping.Add(state, stateEmptyExecuteActivity);
@@ -70,11 +69,12 @@ namespace WorkflowFacilities.Running
                 foreach (var path in transition.TransitionPaths) {
                     var pathConditionFunc = path.ConditionFunc;
                     IExecuteActivity pathactivity = endActivity;
-                    if (pathConditionFunc!=null) {
+                    if (pathConditionFunc != null) {
                         var conditionActivity = new ConditionActivity(pathConditionFunc);
                         pathactivity.NextActivities.Add(conditionActivity);
                         pathactivity = conditionActivity;
                     }
+
                     var aciton = path.Aciton;
                     if (aciton != null) {
                         var customExecuteActivity = new CustomExecuteActivity(aciton.Execute,
@@ -103,25 +103,25 @@ namespace WorkflowFacilities.Running
         /// 运行初始化后的
         /// </summary>
         /// <param name="stateMachine"></param>
-        /// <param name="param"></param>
-        public void Run(StateMachine stateMachine,IDictionary<string,string> param=null)
+        /// <param name="param">运行前输入参数</param>
+        public void Run(StateMachine stateMachine, IDictionary<string, string> param = null)
         {
             //first run
-            if (stateMachine.RunningExecuteActivityEntry == null) {
-                Translate(stateMachine);
-                if (param!=null) {
+            if (!stateMachine.IsRunning) {
+                if (param != null) {
                     foreach (var pair in param) {
                         var stateMachineContext = stateMachine.Context;
-                        stateMachineContext.Set(pair.Key,pair.Value);
+                        stateMachineContext.Set(pair.Key, pair.Value);
                     }
                 }
-                InternalRun(stateMachine.RunningExecuteActivityEntry, stateMachine.Context);
+                InternalRun(stateMachine.ExecuteActivityChainEntry, stateMachine.Context);
             }
             else {
-                foreach (var executeActivity in stateMachine.Context.WaitingForBookmarkList.Values) {
+                foreach (var executeActivity in stateMachine.Context.SuspendedActivities.Values) {
                     InternalRun(executeActivity, stateMachine.Context);
                 }
             }
+            stateMachine.Context.IsRunning = true;
         }
 
 
@@ -159,7 +159,7 @@ namespace WorkflowFacilities.Running
         public void ResumeBookMark(StateMachine stateMachine, string name, string value)
         {
             var stateMachineContext = stateMachine.Context;
-            stateMachineContext.ResumingBookmark=new KeyValuePair<string, object>(name,value);
+            stateMachineContext.ResumingBookmark = new KeyValuePair<string, object>(name, value);
             Run(stateMachine);
         }
     }

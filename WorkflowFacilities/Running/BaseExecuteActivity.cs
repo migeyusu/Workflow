@@ -35,18 +35,16 @@ namespace WorkflowFacilities.Running
 
         public bool IsHangUped { get; set; }
 
-        public bool Executed { get; set; }
-
         //public IActivity ParentActivity { get; set; }
 
         public IList<IExecuteActivity> NextActivities { get; set; }
     }
 
-    public enum RunningActivityType
+    public enum RunningActivityType:int
     {
-        Condition,
-        Custom,
-        Empty,
-        Start,
+        Condition = 1,
+        Custom = 2,
+        Set = 4,
+        Start = 8,
     }
-}
+}   

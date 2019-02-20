@@ -4,3 +4,4 @@
 
 
 用户态->运行态->持久化态
+模板->activity链->statemachine

@@ -55,15 +55,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Consumer\StateMachine.cs" />
-    <None Include="Persistent\Old\StateMachineTemplateModel.cs" />
     <None Include="Persistent\Old\TransitionPathModel.cs" />
+    <Compile Include="Persistent\StateMachineTemplateModel.cs" />
     <Compile Include="Running\BaseExecuteActivity.cs" />
     <Compile Include="Running\ConditionActivity.cs" />
     <Compile Include="Running\CustomExecuteActivity.cs" />
     <Compile Include="Running\IExecutable.cs" />
     <Compile Include="Running\IExecuteActivity.cs" />
     <Compile Include="Persistent\RunningActivityModel.cs" />
-    <Compile Include="Persistent\Configuration.cs" />
     <Compile Include="Persistent\Field.cs" />
     <Compile Include="IActivity.cs" />
     <Compile Include="Consumer\ICustomActivity.cs" />
@@ -75,7 +74,7 @@
     <Compile Include="Persistent\StateMachineModel.cs" />
     <None Include="Persistent\Old\StateModel.cs" />
     <Compile Include="Running\StartActiviy.cs" />
-    <Compile Include="Running\StateEmptyExecuteActivity.cs" />
+    <Compile Include="Running\StateSetExecuteActivity.cs" />
     <Compile Include="Running\StateMachineScheduler.cs" />
     <Compile Include="Consumer\Transition.cs" />
     <None Include="Persistent\Old\TransitionModel.cs" />

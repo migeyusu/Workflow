@@ -17,6 +17,8 @@ namespace WorkflowFacilities.Running
 
         public bool IsCompleted { get; internal set; }
 
+        public bool IsRunning { get; internal set; }
+
         public bool IsWaiting { get; set; }
 
         public KeyValuePair<string,object> ResumingBookmark { get; internal set; }
@@ -24,7 +26,7 @@ namespace WorkflowFacilities.Running
         internal ConcurrentDictionary<string, string> LocalVariableDictionary { get; set; } =
             new ConcurrentDictionary<string, string>();
 
-        internal Dictionary<string, IExecuteActivity> WaitingForBookmarkList { get; set; } =
+        internal Dictionary<string, IExecuteActivity> SuspendedActivities { get; set; } =
             new Dictionary<string, IExecuteActivity>();
 
         public void Set(string name, string value)
@@ -40,7 +42,7 @@ namespace WorkflowFacilities.Running
         internal void InternalRequestHangUp(IExecuteActivity activity)
         {
             activity.IsHangUped = true;
-            WaitingForBookmarkList.Add(activity.Bookmark, activity);
+            SuspendedActivities.Add(activity.Bookmark, activity);
         }
 
         /// <summary>

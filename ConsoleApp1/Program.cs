@@ -17,6 +17,16 @@ namespace ConsoleApp1
         static void Main(string[] args)
         {
             var stateMachineTemplate = new NumberguessTemplate();
+            /*var binaryFormatter = new BinaryFormatter();
+            var memoryStream = new MemoryStream();
+            var concurrentDictionary = new ConcurrentDictionary<string, string>();
+            concurrentDictionary.TryAdd("df", "dsf");
+            binaryFormatter.Serialize(memoryStream, concurrentDictionary);
+            binaryFormatter.Deserialize()
+            memoryStream.Dispose();*/
+            ICustomActivity activity = null;
+            Class.set(out activity);
+            Console.WriteLine(activity.Name);
 
         }
     }
@@ -146,4 +156,18 @@ namespace ConsoleApp1
             _callbackAction?.Invoke(context);
         }
     }
+
+    
+
+
+    public class Class
+    {
+        public static void set(out ICustomActivity activity)
+        {
+            activity=new BaseExecuteActivity() {
+                Name = "sdf"
+            };
+            
+        }
+    } 
 }

@@ -7,11 +7,12 @@ namespace WorkflowFacilities.Persistent
     {
         public Guid Id { get; set; }
 
+        public string Name { get; set; }
+
+        /// <summary>
+        /// 不直接引用template，因为template会长期储存在内存缓存中
+        /// </summary>
         public Guid StateMachineTemplateVersion { get; set; }
-
-        public RunningActivityModel StartActivityModel { get; set; }
-
-        public List<RunningActivityModel> RunningActivityModels { get; set; }
 
         public string CurrentStateName { get; set; }
 
@@ -19,13 +20,12 @@ namespace WorkflowFacilities.Persistent
 
         public string LocalVariousDictionary { get; set; }
 
-        public List<RunningActivityModel> WaitingRunningActivityModels { get; set; }
+        public List<RunningActivityModel> SuspendedActivityModels { get; set; }
 
         public StateMachineModel()
         {
             //Id = Guid.NewGuid();
-            WaitingRunningActivityModels = new List<RunningActivityModel>();
-            RunningActivityModels = new List<RunningActivityModel>();
+            SuspendedActivityModels = new List<RunningActivityModel>();
         }
     }
 }
