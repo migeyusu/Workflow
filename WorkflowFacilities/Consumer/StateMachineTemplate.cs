@@ -12,8 +12,7 @@ namespace WorkflowFacilities.Consumer
      * activity可以不停地产生新实例
      * 为了防止出现多线程竞争，每个statemachine都应该使用新的实例
      * 为了创建实例可以有两种方式：反射load，用户自己实现load方法，我选择了第二种
-     * 优点是性能，缺点是即使需要知道多少个customactivity被注册了也要运行generation
-     * 但缺点在这里不是问题
+     * 所以创建之后翻译就可以直接执行
      */
 
 

@@ -13,9 +13,9 @@ namespace WorkflowFacilities.Running
         public StartActiviy Translate(StateMachineTemplate stateMachine)
         {
             var activitiesMapping = new Dictionary<State, IExecuteActivity>();
-            var startActiviy = new StartActiviy();
-            InternalTranslate(stateMachine.StartState, startActiviy, activitiesMapping);
-            return startActiviy;
+            var startActivity = new StartActiviy();
+            InternalTranslate(stateMachine.StartState, startActivity, activitiesMapping);
+            return startActivity;
         }
 
         private static void InternalTranslate(State state, IExecuteActivity executeActivity,
@@ -31,10 +31,10 @@ namespace WorkflowFacilities.Running
             var entry = state.Entry;
             if (entry != null) {
                 var customExecuteActivity = new CustomExecuteActivity(entry.Execute,
-                    (context) => entry.BookmarkCallback(context)) {
+                    context => entry.BookmarkCallback(context)) {
                     Version = entry.Version,
                     Bookmark = entry.Bookmark,
-                    Name = entry.Name,
+                    Name = entry.Name
                 };
                 activity.NextActivities.Add(customExecuteActivity);
                 activity = customExecuteActivity;
@@ -43,10 +43,10 @@ namespace WorkflowFacilities.Running
             var exit = state.Exit;
             if (exit != null) {
                 var customExecuteActivity = new CustomExecuteActivity(exit.Execute,
-                    (context) => exit.BookmarkCallback(context)) {
+                    context => exit.BookmarkCallback(context)) {
                     Version = exit.Version,
                     Bookmark = exit.Bookmark,
-                    Name = exit.Name,
+                    Name = exit.Name
                 };
                 activity.NextActivities.Add(customExecuteActivity);
                 activity = customExecuteActivity;
@@ -60,7 +60,7 @@ namespace WorkflowFacilities.Running
                         (context) => trigger.BookmarkCallback(context)) {
                         Version = trigger.Version,
                         Bookmark = trigger.Bookmark,
-                        Name = trigger.Name,
+                        Name = trigger.Name
                     };
                     endActivity.NextActivities.Add(customExecuteActivity);
                     endActivity = customExecuteActivity;
@@ -81,7 +81,7 @@ namespace WorkflowFacilities.Running
                             (context) => aciton.BookmarkCallback(context)) {
                             Version = aciton.Version,
                             Bookmark = aciton.Bookmark,
-                            Name = aciton.Name,
+                            Name = aciton.Name
                         };
                         pathactivity.NextActivities.Add(customExecuteActivity);
                         pathactivity = customExecuteActivity;
