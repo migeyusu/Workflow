@@ -11,6 +11,7 @@ namespace WorkflowFacilities.Running
         public Guid Version { get; set; }
 
         public Guid Id { get; set; }
+
         public RunningActivityType ActivityType { get; set; }
 
         public string Name { get; set; }
@@ -20,6 +21,7 @@ namespace WorkflowFacilities.Running
         public BaseExecuteActivity()
         {
             this.Name = "Base";
+            this.Id=Guid.NewGuid();
             NextActivities = new List<IExecuteActivity>();
         }
 

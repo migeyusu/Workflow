@@ -13,7 +13,12 @@ namespace WorkflowFacilities.Persistent
             
         }
 
-        public DbSet<StateMachineModel> StateMachines { get; set; }
+        public WorkflowDbContext():base("WorkflowDb")
+        {
+            
+        }
+
+        public DbSet<StateMachineModel> StateMachineModels { get; set; }
         
         public DbSet<RunningActivityModel> ActivityModels { get; set; }
 

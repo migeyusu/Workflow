@@ -7,7 +7,9 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
+using WorkflowFacilities;
 using WorkflowFacilities.Consumer;
+using WorkflowFacilities.Persistent;
 using WorkflowFacilities.Running;
 
 namespace ConsoleApp1
@@ -16,26 +18,36 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            var stateMachineTemplate = new NumberguessTemplate();
-            /*var binaryFormatter = new BinaryFormatter();
-            var memoryStream = new MemoryStream();
-            var concurrentDictionary = new ConcurrentDictionary<string, string>();
-            concurrentDictionary.TryAdd("df", "dsf");
-            binaryFormatter.Serialize(memoryStream, concurrentDictionary);
-            binaryFormatter.Deserialize()
-            memoryStream.Dispose();*/
-            ICustomActivity activity = null;
-            Class.set(out activity);
-            Console.WriteLine(activity.Name);
-
+            using (var openField = WorkflowFact.OpenField("WorkflowDb")) {
+                new WorkflowFact().Register<NumberguessTemplate>();
+                openField.CheckUpdates();
+                openField.SaveChanges();
+            }
+//            var stateMachineTemplate = new NumberguessTemplate();
+//            var openField = WorkflowFact.OpenField("");
+            //using (var workflowDbContext = new WorkflowDbContext("TestWorkflow")) {
+                /*workflowDbContext.ActivityModels.Add(new RunningActivityModel() {
+                    ActivityType = RunningActivityType.Condition,
+                    Version = Guid.NewGuid(),
+                    Name = "dfsgedf",
+                    Bookmark = "dsagd",
+                });*/
+                /*var runningActivityModel = workflowDbContext.ActivityModels.First();
+                workflowDbContext.ActivityModels.Remove(runningActivityModel);*/
+            //}
         }
     }
 
+    
+
     public class NumberguessTemplate : StateMachineTemplate
     {
-        public override void OnGeneration()
+        public NumberguessTemplate():base()
         {
             this.Version = Guid.Parse("D5AE474A-5919-4A9C-A90E-F14BD8D92E3A");
+        }
+        public override void Generation()
+        {
             var codeActivity = new CodeActivity((context => {
                 var maxNumber = int.Parse(context.Get("MaxNumber"));
                 var target = new System.Random().Next(1, maxNumber + 1);
@@ -119,7 +131,7 @@ namespace ConsoleApp1
             StartState = initializeState;
         }
 
-        public override void OnInitialize(PipelineContext pipelineContext)
+        public override void Initialize(PipelineContext pipelineContext)
         {
             pipelineContext.Set("Guess", null);
             pipelineContext.Set("Target", null);

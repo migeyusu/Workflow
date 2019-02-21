@@ -8,25 +8,28 @@ using WorkflowFacilities.Running;
 
 namespace WorkflowFacilities
 {
-    public class WorkflowFact
+    public interface IWorkflowTemplateRegister
     {
-        private static readonly List<StateMachineTemplate> _templates = new List<StateMachineTemplate>();
+        IWorkflowTemplateRegister Register<T>() where T : StateMachineTemplate;
+    }
 
-        public static List<StateMachineTemplate> Templates {
-            get { return _templates; }
-        }
+    public class WorkflowFact : IWorkflowTemplateRegister
+    {
+//        private static Type baseRegisterType = typeof(StateMachineTemplate);
 
-        public static void Register(StateMachineTemplate template)
+        private static readonly List<Type> templateTypes = new List<Type>();
+
+        public static List<Type> AllTemplateTypes => templateTypes;
+
+        public IWorkflowTemplateRegister Register<T>() where T : StateMachineTemplate
         {
-            if (_templates.FirstOrDefault(
-                    machineTemplate => machineTemplate.Version == template.Version) != null) {
-                return;
+            var type = typeof(T);
+            if (!templateTypes.Contains(type)) {
+                templateTypes.Add(type);
             }
-            _templates.Add(template);
-        }
 
-        internal static StateMachineTemplate Get(Guid versionGuid) =>
-            _templates.FirstOrDefault((template => template.Version == versionGuid));
+            return this;
+        }
 
         /// <summary>
         /// 访问的入口
@@ -37,81 +40,10 @@ namespace WorkflowFacilities
         /// <returns></returns>
         public static Field OpenField(string constring)
         {
-            var workflowDbContext = new WorkflowDbContext(constring);
+            var workflowDbContext = string.IsNullOrEmpty(constring)
+                ? new WorkflowDbContext()
+                : new WorkflowDbContext(constring);
             return new Field(workflowDbContext);
-        }
-
-
-        internal static IExecuteActivity Deserialize(RunningActivityModel activityModel,
-            IDictionary<Guid, IExecuteActivity> cache, StateMachineTemplate template)
-        {
-            IExecuteActivity executeActivity;
-            switch (activityModel.ActivityType) {
-                case RunningActivityType.Condition:
-                    var transitionPath =
-                        template.TransitionPaths.FirstOrDefault(path => path.Version == activityModel.Version);
-                    if (transitionPath == null) {
-                        throw new ObjectNotFoundException(
-                            $"无法从模板{template.Name}找到version为{activityModel.Version}的transitionpath！");
-                    }
-
-                    executeActivity = new ConditionActivity(transitionPath.ConditionFunc);
-                    break;
-                case RunningActivityType.Custom:
-                    var customActivity = template.CustomActivities.FirstOrDefault(
-                        activity => activity.Version == activityModel.Version);
-                    if (customActivity == null) {
-                        throw new ObjectNotFoundException(
-                            $"无法从模板{template.Name}找到version为{activityModel.Version}的activity！");
-                    }
-
-                    executeActivity =
-                        new CustomExecuteActivity(customActivity.Execute, customActivity.BookmarkCallback) {
-                            Version = activityModel.Version,
-                            Bookmark = activityModel.Bookmark,
-                            Name = activityModel.Name,
-                        };
-                    break;
-                case RunningActivityType.Set:
-                    executeActivity = new StateSetExecuteActivity() {
-                        Name = activityModel.Name,
-                    };
-                    break;
-                case RunningActivityType.Start:
-                    executeActivity = new StartActiviy();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            foreach (var nextActivity in activityModel.RunningActivityModels) {
-                if (!cache.TryGetValue(nextActivity.Id, out var activity)) {
-                    activity = Deserialize(nextActivity, cache, template);
-                }
-
-                executeActivity.NextActivities.Add(activity);
-            }
-
-            return executeActivity;
-        }
-
-        internal static RunningActivityModel Serialize(IExecuteActivity executeActivity,
-            IDictionary<Guid, RunningActivityModel> cache)
-        {
-            var activityModel = new RunningActivityModel {
-                Version = executeActivity.Version, 
-                Name = executeActivity.Name, 
-                Bookmark = executeActivity.Bookmark
-            };
-            cache.Add(activityModel.Id, activityModel);
-            foreach (var nextActivity in executeActivity.NextActivities) {
-                if (cache.TryGetValue(nextActivity.Id)) { }
-
-                var runningActivityModel = Serialize(nextActivity, cache);
-                activityModel.RunningActivityModels.Add(runningActivityModel);
-            }
-
-            return activityModel;
         }
     }
 }

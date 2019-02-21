@@ -56,6 +56,11 @@
   <ItemGroup>
     <Compile Include="Consumer\StateMachine.cs" />
     <None Include="Persistent\Old\TransitionPathModel.cs" />
+    <Compile Include="Migrations\201902210939232_InitialCreate.cs" />
+    <Compile Include="Migrations\201902210939232_InitialCreate.Designer.cs">
+      <DependentUpon>201902210939232_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Persistent\StateMachineTemplateModel.cs" />
     <Compile Include="Running\BaseExecuteActivity.cs" />
     <Compile Include="Running\ConditionActivity.cs" />
@@ -88,6 +93,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="TextFile1.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201902210939232_InitialCreate.resx">
+      <DependentUpon>201902210939232_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

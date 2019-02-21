@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace WorkflowFacilities.Persistent
 {
@@ -14,8 +15,14 @@ namespace WorkflowFacilities.Persistent
 
     public class StateMachineTemplateModel
     {
+        [Key]
         public Guid Version { get; set; }
-   
+
+        /// <summary>
+        /// 模板类类型
+        /// </summary>
+        public string TemplateClassTypeName { get; set; }
+
         public RunningActivityModel StartActivityModel { get; set; }
 
         public List<RunningActivityModel> RunningActivityModels { get; set; }

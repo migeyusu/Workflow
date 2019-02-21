@@ -1,11 +1,12 @@
 ﻿using System;
+using WorkflowFacilities.Consumer;
 
 namespace WorkflowFacilities.Running
 {
     /// <summary>
     /// 用于包裹自定义执行器
     /// </summary>
-    public class CustomExecuteActivity : BaseExecuteActivity
+/*    public class CustomExecuteActivity : BaseExecuteActivity
     {
         private readonly Func<PipelineContext, bool> _executeFunc;
 
@@ -28,6 +29,28 @@ namespace WorkflowFacilities.Running
         public override void BookmarkCallback(PipelineContext context)
         {
             _callbackAction?.Invoke(context);
+        }
+    }*/
+    public class CustomExecuteActivity : BaseExecuteActivity
+    {
+        private readonly ICustomActivity _customActivity;
+
+        public CustomExecuteActivity(ICustomActivity customActivity)
+        {
+            this._customActivity = customActivity;
+            this.Version = customActivity.Version;
+            this.Bookmark = customActivity.Bookmark;
+            this.Name = customActivity.Name;
+        }
+
+        public override bool Execute(PipelineContext context)
+        {
+            return _customActivity.Execute(context);
+        }
+
+        public override void BookmarkCallback(PipelineContext context)
+        {
+            _customActivity.BookmarkCallback(context);
         }
     }
 }
