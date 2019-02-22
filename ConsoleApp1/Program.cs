@@ -25,7 +25,6 @@ namespace ConsoleApp1
                 new WorkflowFact().Register<NumberguessTemplate>();
                 openField.CheckUpdates();
                 stateMachine = openField.NewStateMachine<NumberguessTemplate>();
-                
                 openField.SaveChanges();
             }
 
@@ -47,6 +46,8 @@ namespace ConsoleApp1
                     }
                 }
             }
+
+            Console.ReadKey();
         }
     
 
@@ -145,7 +146,7 @@ namespace ConsoleApp1
                 ConditionFunc = context => {
                     var guess = context.Get("Guess");
                     var target = context.Get("Target");
-                    return guess == target;
+                    return guess != target;
                 },
                 Aciton = activity1,
                 Version = Guid.Parse("FC7A3F25-0577-42CD-B706-B79A96108415")

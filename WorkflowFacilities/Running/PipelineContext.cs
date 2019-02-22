@@ -41,7 +41,6 @@ namespace WorkflowFacilities.Running
 
         internal void InternalRequestHangUp(IExecuteActivity activity)
         {
-            activity.IsHangUped = true;
             SuspendedActivities.Add(activity.Bookmark, activity);
         }
 

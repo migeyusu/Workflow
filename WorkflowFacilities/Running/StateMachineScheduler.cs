@@ -129,11 +129,14 @@ namespace WorkflowFacilities.Running
             }
             else {
                 _context.IsRunning = true;
-                foreach (var executeActivity in _context.SuspendedActivities.Values) {
+                var executeActivities = _context.SuspendedActivities.Values.Select(activity => {
+                    //因为从持久化中恢复的activity会没有该标志位，需要手动添加，同内部会移除suspendactivity
+                    activity.IsHangUped = true;
+                    return activity;
+                }).ToList();
+                foreach (var executeActivity in executeActivities) {
                     InternalRun(executeActivity, _context);
-                    executeActivity.IsHangUped = false;
                 }
-                _context.SuspendedActivities.Clear();
             }
 
             if (_context.IsCompleted) {
@@ -153,6 +156,7 @@ namespace WorkflowFacilities.Running
                 activity.BookmarkCallback(context);
                 context.ResumingBookmark = new KeyValuePair<string, object>();
                 activity.IsHangUped = false;
+                context.SuspendedActivities.Remove(activity.Bookmark);
             }
             else {
                 var execute = activity.Execute(context);
@@ -162,6 +166,7 @@ namespace WorkflowFacilities.Running
 
                 if (context.IsWaiting) {
                     context.InternalRequestHangUp(activity);
+                    context.IsWaiting = false;
                     return;
                 }
             }

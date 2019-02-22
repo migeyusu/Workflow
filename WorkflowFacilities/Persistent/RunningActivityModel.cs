@@ -12,6 +12,7 @@ namespace WorkflowFacilities.Persistent
         public Guid Id { get; set; }
 
         public RunningActivityType ActivityType { get; set; }
+
         /// <summary>
         /// clarify activity type,used to mapping:if guid exist in 
         /// </summary>
@@ -26,7 +27,7 @@ namespace WorkflowFacilities.Persistent
         public RunningActivityModel()
         {
             Id = Guid.NewGuid();
-            RunningActivityModels=new List<RunningActivityModel>();
+            RunningActivityModels = new List<RunningActivityModel>();
         }
     }
 }
