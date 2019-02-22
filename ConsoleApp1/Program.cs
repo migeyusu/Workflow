@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Permissions;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using WorkflowFacilities;
 using WorkflowFacilities.Consumer;
@@ -18,34 +19,60 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
+            StateMachine stateMachine;
+            //var idelEvent = new AutoResetEvent(false);
             using (var openField = WorkflowFact.OpenField("WorkflowDb")) {
                 new WorkflowFact().Register<NumberguessTemplate>();
                 openField.CheckUpdates();
+                stateMachine = openField.NewStateMachine<NumberguessTemplate>();
+                
                 openField.SaveChanges();
             }
+
+            var stateMachineScheduler = new StateMachineScheduler(stateMachine);
+            var completed = false;
+            //stateMachineScheduler.OnIdle += () => { idelEvent.Set(); };
+            stateMachineScheduler.OnCompleted += () => { completed = true; };
+            stateMachineScheduler.Run();
+            while (!completed) {
+                var validEntry = false;
+                while (!validEntry) {
+                    if (!Int32.TryParse(Console.ReadLine(), out var guess)) {
+                        Console.WriteLine("Please enter an integer.");
+                    }
+                    else {
+                        validEntry = true;
+                        stateMachineScheduler.ResumeBookmark("EnterGuess", guess.ToString());
+                        
+                    }
+                }
+            }
+        }
+    
+
+
 //            var stateMachineTemplate = new NumberguessTemplate();
 //            var openField = WorkflowFact.OpenField("");
-            //using (var workflowDbContext = new WorkflowDbContext("TestWorkflow")) {
-                /*workflowDbContext.ActivityModels.Add(new RunningActivityModel() {
+            /*using (var workflowDbContext = new WorkflowDbContext("WorkflowDb")) {
+                workflowDbContext.ActivityModels.Add(new RunningActivityModel() {
                     ActivityType = RunningActivityType.Condition,
                     Version = Guid.NewGuid(),
                     Name = "dfsgedf",
                     Bookmark = "dsagd",
-                });*/
-                /*var runningActivityModel = workflowDbContext.ActivityModels.First();
-                workflowDbContext.ActivityModels.Remove(runningActivityModel);*/
-            //}
+                });
+                var runningActivityModel = workflowDbContext.ActivityModels.First();
+                workflowDbContext.ActivityModels.Remove(runningActivityModel);
+                workflowDbContext.SaveChanges();*/
         }
-    }
 
-    
 
     public class NumberguessTemplate : StateMachineTemplate
     {
-        public NumberguessTemplate():base()
+        public NumberguessTemplate() : base()
         {
             this.Version = Guid.Parse("D5AE474A-5919-4A9C-A90E-F14BD8D92E3A");
         }
+
         public override void Generation()
         {
             var codeActivity = new CodeActivity((context => {
@@ -76,9 +103,9 @@ namespace ConsoleApp1
                 var i = int.Parse(context.Get("Target"));
                 Console.WriteLine(s < i ? "Your guess is too low." : "Your guess is too high.");
                 return true;
-            }),null){Version = Guid.Parse("E85BB78B-5C36-488E-8C93-D857B4ED9625")};
+            }), null) {Version = Guid.Parse("E85BB78B-5C36-488E-8C93-D857B4ED9625")};
             CustomActivities.AddRange(new[] {codeActivity, activity, codeActivity1, readIntActivity, activity1});
-            
+
             var initializeState = new State() {
                 Name = "Initialize Target",
                 Entry = codeActivity,
@@ -91,7 +118,7 @@ namespace ConsoleApp1
             var finalState = new State() {
                 Name = "FinalState"
             };
-            States.AddRange(new []{initializeState,enterState,finalState});
+            States.AddRange(new[] {initializeState, enterState, finalState});
 
             //空transition和path理论上不需要加进去
             var transition = new Transition();
@@ -101,10 +128,10 @@ namespace ConsoleApp1
                 Trigger = readIntActivity,
                 Version = Guid.Parse("2EF26ADC-3D0E-4DEA-9DFD-6E46D5979A87")
             };
-            Transitions.AddRange(new []{transition1});
-            
+            Transitions.AddRange(new[] {transition1});
+
             var transitionPath = new TransitionPath() {
-                To = finalState, 
+                To = finalState,
                 ConditionFunc = context => {
                     var guess = context.Get("Guess");
                     var target = context.Get("Target");
@@ -126,7 +153,7 @@ namespace ConsoleApp1
             transition1.TransitionPaths.Add(path);
             enterState.Transitions.Add(transition1);
 
-            TransitionPaths.AddRange(new []{transitionPath,path});
+            TransitionPaths.AddRange(new[] {transitionPath, path});
 
             StartState = initializeState;
         }
@@ -168,18 +195,4 @@ namespace ConsoleApp1
             _callbackAction?.Invoke(context);
         }
     }
-
-    
-
-
-    public class Class
-    {
-        public static void set(out ICustomActivity activity)
-        {
-            activity=new BaseExecuteActivity() {
-                Name = "sdf"
-            };
-            
-        }
-    } 
 }

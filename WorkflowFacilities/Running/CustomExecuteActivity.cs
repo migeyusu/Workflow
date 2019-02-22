@@ -33,6 +33,8 @@ namespace WorkflowFacilities.Running
     }*/
     public class CustomExecuteActivity : BaseExecuteActivity
     {
+        private const string Customstring = "Custom";
+
         private readonly ICustomActivity _customActivity;
 
         public CustomExecuteActivity(ICustomActivity customActivity)
@@ -40,7 +42,8 @@ namespace WorkflowFacilities.Running
             this._customActivity = customActivity;
             this.Version = customActivity.Version;
             this.Bookmark = customActivity.Bookmark;
-            this.Name = customActivity.Name;
+            this.Name = string.IsNullOrEmpty(customActivity.Name) ? Customstring : customActivity.Name;
+            this.ActivityType = RunningActivityType.Custom;
         }
 
         public override bool Execute(PipelineContext context)

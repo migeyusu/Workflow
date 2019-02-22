@@ -19,7 +19,7 @@ namespace WorkflowFacilities
 
         private static readonly List<Type> templateTypes = new List<Type>();
 
-        public static List<Type> AllTemplateTypes => templateTypes;
+        internal static List<Type> AllTemplateTypes => templateTypes;
 
         public IWorkflowTemplateRegister Register<T>() where T : StateMachineTemplate
         {

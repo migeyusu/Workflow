@@ -9,10 +9,33 @@ namespace WorkflowFacilities.Running
 {
     public class StateMachineScheduler
     {
+        public event Action OnIdle;
+
+        public event Action OnCompleted;
+
+        private readonly StateMachine _stateMachine;
+
+        private PipelineContext _context;
+
+        public StateMachineScheduler(StateMachine stateMachine)
+        {
+            this._stateMachine = stateMachine;
+            _context = stateMachine.Context;
+        }
+
+        public virtual void RiseIdle()
+        {
+            OnIdle?.Invoke();
+        }
+
+        public virtual void RiseCompleted()
+        {
+            OnCompleted?.Invoke();
+        }
+
         /*
          * 翻译成可执行的activity
          */
-
         public static StartActiviy Translate(StateMachineTemplate stateMachine)
         {
             var activitiesMapping = new Dictionary<State, IExecuteActivity>();
@@ -62,7 +85,9 @@ namespace WorkflowFacilities.Running
                     var pathConditionFunc = path.ConditionFunc;
                     var pathactivity = endActivity;
                     if (pathConditionFunc != null) {
-                        var conditionActivity = new ConditionActivity(pathConditionFunc);
+                        var conditionActivity = new ConditionActivity(pathConditionFunc) {
+                            Version = path.Version
+                        };
                         pathactivity.NextActivities.Add(conditionActivity);
                         pathactivity = conditionActivity;
                     }
@@ -85,34 +110,41 @@ namespace WorkflowFacilities.Running
             }
         }
 
-
         /// <summary>
         /// 运行初始化后的
         /// </summary>
         /// <param name="stateMachine"></param>
         /// <param name="param">运行前输入参数</param>
-        public void Run(StateMachine stateMachine, IDictionary<string, string> param = null)
+        public void Run()
         {
-            //first run
-            if (!stateMachine.IsRunning) {
-                if (param != null) {
-                    foreach (var pair in param) {
-                        var stateMachineContext = stateMachine.Context;
-                        stateMachineContext.Set(pair.Key, pair.Value);
-                    }
-                }
+            if (_stateMachine.IsCompleted) {
+                throw new ArgumentException("不能运行已经结束的statemachine！");
+            }
 
-                InternalRun(stateMachine.ExecuteActivityChainEntry, stateMachine.Context);
+            //first run
+            if (!_stateMachine.IsRunning) {
+                _context.IsRunning = true;
+                _stateMachine.InitializeAction?.Invoke(_context);
+                InternalRun(_stateMachine.ExecuteActivityChainEntry, _stateMachine.Context);
             }
             else {
-                foreach (var executeActivity in stateMachine.Context.SuspendedActivities.Values) {
-                    InternalRun(executeActivity, stateMachine.Context);
+                _context.IsRunning = true;
+                foreach (var executeActivity in _context.SuspendedActivities.Values) {
+                    InternalRun(executeActivity, _context);
+                    executeActivity.IsHangUped = false;
                 }
+                _context.SuspendedActivities.Clear();
             }
 
-            stateMachine.Context.IsRunning = true;
-        }
+            if (_context.IsCompleted) {
+                _context.IsRunning = false;
+                this.RiseCompleted();
+            }
 
+            if (!_context.IsCompleted) {
+                this.RiseIdle();
+            }
+        }
 
         private void InternalRun(IExecuteActivity activity, PipelineContext context)
         {
@@ -145,11 +177,10 @@ namespace WorkflowFacilities.Running
             }
         }
 
-        public void ResumeBookMark(StateMachine stateMachine, string name, string value)
+        public void ResumeBookmark(string name, string value)
         {
-            var stateMachineContext = stateMachine.Context;
-            stateMachineContext.ResumingBookmark = new KeyValuePair<string, object>(name, value);
-            Run(stateMachine);
+            _context.ResumingBookmark = new KeyValuePair<string, object>(name, value);
+            Run();
         }
 
         internal static IExecuteActivity Deserialize(RunningActivityModel activityModel,
@@ -195,7 +226,7 @@ namespace WorkflowFacilities.Running
             }
 
             executeActivity.Id = activityModel.Id;
-            cache.Add(activityModel.Id,executeActivity);
+            cache.Add(activityModel.Id, executeActivity);
             foreach (var nextActivity in activityModel.RunningActivityModels) {
                 if (!cache.TryGetValue(nextActivity.Id, out var activity)) {
                     activity = Deserialize(nextActivity, cache, template);
@@ -207,7 +238,6 @@ namespace WorkflowFacilities.Running
             return executeActivity;
         }
 
-
         internal static RunningActivityModel Serialize(IExecuteActivity executeActivity,
             IDictionary<Guid, RunningActivityModel> cache)
         {
@@ -215,7 +245,8 @@ namespace WorkflowFacilities.Running
                 Version = executeActivity.Version,
                 Name = executeActivity.Name,
                 Bookmark = executeActivity.Bookmark,
-                Id = executeActivity.Id
+                Id = executeActivity.Id,
+                ActivityType = executeActivity.ActivityType,
             };
             cache.Add(executeActivity.Id, activityModel);
             foreach (var nextActivity in executeActivity.NextActivities) {

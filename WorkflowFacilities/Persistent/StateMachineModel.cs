@@ -12,7 +12,7 @@ namespace WorkflowFacilities.Persistent
         /// <summary>
         /// 不直接引用template，因为template只会在内存中
         /// </summary>
-        public StateMachineTemplateModel TemplateModel { get; set; }
+        public virtual StateMachineTemplateModel TemplateModel { get; set; }
 
         #region context
 
@@ -24,7 +24,7 @@ namespace WorkflowFacilities.Persistent
 
         public string LocalVariousDictionary { get; set; }
 
-        public List<RunningActivityModel> SuspendedActivityModels { get; set; }
+        public virtual List<RunningActivityModel> SuspendedActivityModels { get; set; }
 
         #endregion
 

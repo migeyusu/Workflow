@@ -23,9 +23,9 @@ namespace WorkflowFacilities.Persistent
         /// </summary>
         public string TemplateClassTypeName { get; set; }
 
-        public RunningActivityModel StartActivityModel { get; set; }
+        public virtual RunningActivityModel StartActivityModel { get; set; }
 
-        public List<RunningActivityModel> RunningActivityModels { get; set; }
+        public virtual List<RunningActivityModel> RunningActivityModels { get; set; }
 
         public StateMachineTemplateModel()
         {

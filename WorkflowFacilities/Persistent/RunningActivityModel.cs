@@ -21,7 +21,7 @@ namespace WorkflowFacilities.Persistent
 
         public string Bookmark { get; set; }
 
-        public List<RunningActivityModel> RunningActivityModels { get; set; }
+        public virtual List<RunningActivityModel> RunningActivityModels { get; set; }
 
         public RunningActivityModel()
         {

@@ -62,7 +62,7 @@ namespace WorkflowFacilities.Persistent
             var activityDictionary = new Dictionary<Guid, IExecuteActivity>();
             var executeActivity =
                 StateMachineScheduler.Deserialize(templateModel.StartActivityModel, activityDictionary, template);
-            var stateMachine = new StateMachine {
+            var stateMachine = new StateMachine(template.Initialize) {
                 Version = templateModel.Version,
                 Id = Guid.NewGuid(),
                 Context = new PipelineContext(),
@@ -170,7 +170,7 @@ namespace WorkflowFacilities.Persistent
                 pipelineContext.LocalVariableDictionary = dictionary;
             }
 
-            var stateMachine = new StateMachine {
+            var stateMachine = new StateMachine(stateMachineTemplate.Initialize) {
                 Id = stateMachineModel.Id,
                 ExecuteActivityChainEntry = activity,
                 Context = pipelineContext,

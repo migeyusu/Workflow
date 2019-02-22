@@ -25,16 +25,20 @@ namespace WorkflowFacilities.Consumer
         /// <summary>
         /// activity链
         /// </summary>
-        public IExecuteActivity ExecuteActivityChainEntry { get; set; }
+        internal IExecuteActivity ExecuteActivityChainEntry { get; set; }
 
         public bool IsCompleted => Context.IsCompleted;
 
         public bool IsRunning => Context.IsRunning;
 
-        public PipelineContext Context { get; set; }
+        internal PipelineContext Context { get; set; }
 
-        internal StateMachine()
-        { }
+        internal Action<PipelineContext> InitializeAction { get; set; }
+
+        internal StateMachine(Action<PipelineContext> initializeAction)
+        {
+            this.InitializeAction = initializeAction;
+        }
 
 
     }

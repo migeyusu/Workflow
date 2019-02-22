@@ -20,8 +20,7 @@ namespace WorkflowFacilities.Running
 
         public BaseExecuteActivity()
         {
-            this.Name = "Base";
-            this.Id=Guid.NewGuid();
+            this.Id = Guid.NewGuid();
             NextActivities = new List<IExecuteActivity>();
         }
 
@@ -41,12 +40,4 @@ namespace WorkflowFacilities.Running
 
         public IList<IExecuteActivity> NextActivities { get; set; }
     }
-
-    public enum RunningActivityType:int
-    {
-        Condition = 1,
-        Custom = 2,
-        Set = 4,
-        Start = 8,
-    }
-}   
+}

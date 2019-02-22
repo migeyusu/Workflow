@@ -18,6 +18,26 @@ namespace WorkflowFacilities.Persistent
             
         }
 
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<StateMachineModel>()
+                .HasMany((s) => s.SuspendedActivityModels)
+                .WithMany();
+//                .WithRequired()
+//                .HasForeignKey(model => model.Id);
+            modelBuilder.Entity<StateMachineTemplateModel>()
+                .HasMany((s) => s.RunningActivityModels)
+                .WithMany();
+//                .WithRequired()
+//                .HasForeignKey((model => model.Id));
+            modelBuilder.Entity<RunningActivityModel>()
+                .HasMany((s) => s.RunningActivityModels)
+                .WithMany();
+            base.OnModelCreating(modelBuilder);
+            
+        }
+
+
         public DbSet<StateMachineModel> StateMachineModels { get; set; }
         
         public DbSet<RunningActivityModel> ActivityModels { get; set; }
