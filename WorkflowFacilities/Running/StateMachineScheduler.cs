@@ -122,13 +122,12 @@ namespace WorkflowFacilities.Running
             }
 
             //first run
-            if (!_stateMachine.IsRunning) {
-                _context.IsRunning = true;
+            if (!_context.IsRunning) {
                 _stateMachine.InitializeAction?.Invoke(_context);
                 InternalRun(_stateMachine.ExecuteActivityChainEntry, _stateMachine.Context);
+                _context.IsRunning = true;
             }
             else {
-                _context.IsRunning = true;
                 var executeActivities = _context.SuspendedActivities.Values.Select(activity => {
                     //因为从持久化中恢复的activity会没有该标志位，需要手动添加，同内部会移除suspendactivity
                     activity.IsHangUped = true;
@@ -165,6 +164,7 @@ namespace WorkflowFacilities.Running
                 }
 
                 if (context.IsWaiting) {
+                    
                     context.InternalRequestHangUp(activity);
                     context.IsWaiting = false;
                     return;

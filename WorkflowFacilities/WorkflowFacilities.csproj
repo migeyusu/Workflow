@@ -56,6 +56,16 @@
   <ItemGroup>
     <Compile Include="Consumer\StateMachine.cs" />
     <None Include="Persistent\Old\TransitionPathModel.cs" />
+    <Compile Include="IWorkflowTemplateRegister.cs" />
+    <Compile Include="Migrations\201902220356329_InitialCreate.cs" />
+    <Compile Include="Migrations\201902220356329_InitialCreate.Designer.cs">
+      <DependentUpon>201902220356329_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902230820523_ReviseP.cs" />
+    <Compile Include="Migrations\201902230820523_ReviseP.Designer.cs">
+      <DependentUpon>201902230820523_ReviseP.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Persistent\StateMachineTemplateModel.cs" />
     <Compile Include="Running\BaseExecuteActivity.cs" />
     <Compile Include="Running\ConditionActivity.cs" />
@@ -89,6 +99,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="TextFile1.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201902220356329_InitialCreate.resx">
+      <DependentUpon>201902220356329_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902230820523_ReviseP.resx">
+      <DependentUpon>201902230820523_ReviseP.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

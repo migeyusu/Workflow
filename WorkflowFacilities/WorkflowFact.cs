@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.Entity.Core;
 using System.Linq;
 using WorkflowFacilities.Consumer;
@@ -8,24 +9,37 @@ using WorkflowFacilities.Running;
 
 namespace WorkflowFacilities
 {
-    public interface IWorkflowTemplateRegister
-    {
-        IWorkflowTemplateRegister Register<T>() where T : StateMachineTemplate;
-    }
-
     public class WorkflowFact : IWorkflowTemplateRegister
     {
-//        private static Type baseRegisterType = typeof(StateMachineTemplate);
+        internal static Dictionary<string, Type> AllTemplateTypes { get; } = new Dictionary<string, Type>();
 
-        private static readonly List<Type> templateTypes = new List<Type>();
-
-        internal static List<Type> AllTemplateTypes => templateTypes;
 
         public IWorkflowTemplateRegister Register<T>() where T : StateMachineTemplate
         {
             var type = typeof(T);
-            if (!templateTypes.Contains(type)) {
-                templateTypes.Add(type);
+            if (AllTemplateTypes.Values.Contains(type)) {
+                return this;
+            }
+
+            try {
+                var instance = Activator.CreateInstance<T>();
+                if (instance.Version == Guid.Empty) {
+                    throw new NullReferenceException($"模板{type.Name}的version没有在构造函数里初始化");
+                }
+
+                var instanceName = instance.Name;
+                if (string.IsNullOrEmpty(instanceName)) {
+                    throw new NullReferenceException($"模板{type.Name}的name没有在构造函数里初始化！");
+                }
+
+                if (AllTemplateTypes.ContainsKey(instanceName)) {
+                    throw new DuplicateNameException($"已经存在名为{instanceName}的模板类！");
+                }
+                AllTemplateTypes.Add(instanceName, type);
+                
+            }
+            catch (Exception e) {
+                throw new ArgumentOutOfRangeException($"无法生成模板{type.Name}实例！", e);
             }
 
             return this;

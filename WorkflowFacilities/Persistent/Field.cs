@@ -30,7 +30,7 @@ namespace WorkflowFacilities.Persistent
             var guids = _workflowDbContext.StateMachineTemplateModels
                 .Select(model => model.Version);
             var runningActivityModels = new Dictionary<Guid, RunningActivityModel>();
-            var insertTemplateModels = WorkflowFact.AllTemplateTypes
+            var insertTemplateModels = WorkflowFact.AllTemplateTypes.Values
                 .Select(type => Activator.CreateInstance(type) as StateMachineTemplate)
                 .Where(template => template != null && !guids.Contains(template.Version))
                 .Select(template => {
@@ -38,7 +38,7 @@ namespace WorkflowFacilities.Persistent
                     var startActiviy = StateMachineScheduler.Translate(template);
                     return new StateMachineTemplateModel {
                         Version = template.Version,
-                        TemplateClassTypeName = template.GetType().FullName,
+                        CodeTemplateName = template.Name,
                         StartActivityModel = StateMachineScheduler
                             .Serialize(startActiviy, runningActivityModels),
                         RunningActivityModels = runningActivityModels.Values.ToList()
@@ -46,7 +46,6 @@ namespace WorkflowFacilities.Persistent
                 });
             _workflowDbContext.ActivityModels.AddRange(runningActivityModels.Values);
             _workflowDbContext.StateMachineTemplateModels.AddRange(insertTemplateModels);
-           
         }
 
         public StateMachine NewStateMachine<T>() where T : StateMachineTemplate
@@ -74,6 +73,11 @@ namespace WorkflowFacilities.Persistent
 
         public void Save(StateMachine stateMachine)
         {
+            var machineModel = _workflowDbContext.StateMachineModels.Find(stateMachine.Id);
+            if (machineModel != null) {
+                throw new DuplicateNameException("该statemachine已持久化，不能重复保存！");
+            }
+
             var stateMachineTemplateModel =
                 _workflowDbContext.StateMachineTemplateModels.Find(stateMachine.Version);
             if (stateMachineTemplateModel == null) {
@@ -146,7 +150,9 @@ namespace WorkflowFacilities.Persistent
             }
 
             var templateModel = stateMachineModel.TemplateModel;
-            var type = Type.GetType(templateModel.TemplateClassTypeName);
+            if (!WorkflowFact.AllTemplateTypes.TryGetValue(templateModel.CodeTemplateName,out var type)) {
+                throw new KeyNotFoundException($"找不到名为{templateModel.CodeTemplateName}的模板类！");
+            }
             var stateMachineTemplate =
                 Activator.CreateInstance(type ?? throw new TypeLoadException("数据库关联模板的代码已经变更，未找到指定类型")) as
                     StateMachineTemplate;
@@ -158,10 +164,14 @@ namespace WorkflowFacilities.Persistent
             var executeActivities = new Dictionary<Guid, IExecuteActivity>();
             var activity = StateMachineScheduler.Deserialize(templateModel.StartActivityModel, executeActivities,
                 stateMachineTemplate);
+            var activities = stateMachineModel.SuspendedActivityModels
+                .Select(model => executeActivities[model.Id])
+                .ToDictionary(executeActivity => executeActivity.Bookmark, executeActivity => executeActivity);
             var pipelineContext = new PipelineContext() {
                 CurrentStateName = stateMachineModel.CurrentStateName,
                 IsCompleted = stateMachineModel.IsCompleted,
-                IsRunning = stateMachineModel.IsRunning
+                IsRunning = stateMachineModel.IsRunning,
+                SuspendedActivities = activities
             };
             var binaryFormatter = new BinaryFormatter();
             var bytes = Encoding.Unicode.GetBytes(stateMachineModel.LocalVariousDictionary);
@@ -169,7 +179,7 @@ namespace WorkflowFacilities.Persistent
                 var dictionary = binaryFormatter.Deserialize(memoryStream) as ConcurrentDictionary<string, string>;
                 pipelineContext.LocalVariableDictionary = dictionary;
             }
-
+            
             var stateMachine = new StateMachine(stateMachineTemplate.Initialize) {
                 Id = stateMachineModel.Id,
                 ExecuteActivityChainEntry = activity,

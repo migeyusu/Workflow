@@ -15,25 +15,23 @@ using WorkflowFacilities.Running;
 
 namespace ConsoleApp1
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
-            StateMachine stateMachine;
-            //var idelEvent = new AutoResetEvent(false);
+            new WorkflowFact().Register<NumberguessTemplate>();
+
+/*            StateMachine stateMachine;
             using (var openField = WorkflowFact.OpenField("WorkflowDb")) {
-                new WorkflowFact().Register<NumberguessTemplate>();
                 openField.CheckUpdates();
                 stateMachine = openField.NewStateMachine<NumberguessTemplate>();
                 openField.SaveChanges();
             }
-
             var stateMachineScheduler = new StateMachineScheduler(stateMachine);
             var completed = false;
-            //stateMachineScheduler.OnIdle += () => { idelEvent.Set(); };
             stateMachineScheduler.OnCompleted += () => { completed = true; };
             stateMachineScheduler.Run();
-            while (!completed) {
+            if (!completed) {
                 var validEntry = false;
                 while (!validEntry) {
                     if (!Int32.TryParse(Console.ReadLine(), out var guess)) {
@@ -42,29 +40,35 @@ namespace ConsoleApp1
                     else {
                         validEntry = true;
                         stateMachineScheduler.ResumeBookmark("EnterGuess", guess.ToString());
-                        
                     }
                 }
             }
+            using (var openField = WorkflowFact.OpenField("WorkflowDb")) {
+                openField.Save(stateMachine);
+                Console.WriteLine(stateMachine.Id);
+                openField.SaveChanges();
+            }*/
+            var binaryFormatter = new BinaryFormatter();
+            Encoding.Unicode.GetString()
+            using (var memoryStream = new MemoryStream()) {
+                
+            }
 
+//            using (var openField = WorkflowFact.OpenField("WorkflowDb"))
+//            {
+//                var findStateMachine = openField.Get(Guid.Parse("FA443631-2492-4411-B034-2BA7E8A0F84A"));
+//                var machineScheduler = new StateMachineScheduler(findStateMachine);
+//                machineScheduler.ResumeBookmark("EnterGuess", 10.ToString());
+//                openField.Update(findStateMachine);
+//                openField.SaveChanges();
+//            }
+  
             Console.ReadKey();
         }
-    
 
 
-//            var stateMachineTemplate = new NumberguessTemplate();
-//            var openField = WorkflowFact.OpenField("");
-            /*using (var workflowDbContext = new WorkflowDbContext("WorkflowDb")) {
-                workflowDbContext.ActivityModels.Add(new RunningActivityModel() {
-                    ActivityType = RunningActivityType.Condition,
-                    Version = Guid.NewGuid(),
-                    Name = "dfsgedf",
-                    Bookmark = "dsagd",
-                });
-                var runningActivityModel = workflowDbContext.ActivityModels.First();
-                workflowDbContext.ActivityModels.Remove(runningActivityModel);
-                workflowDbContext.SaveChanges();*/
-        }
+
+    }
 
 
     public class NumberguessTemplate : StateMachineTemplate
@@ -72,6 +76,7 @@ namespace ConsoleApp1
         public NumberguessTemplate() : base()
         {
             this.Version = Guid.Parse("D5AE474A-5919-4A9C-A90E-F14BD8D92E3A");
+            this.Name = "NumberGuess";
         }
 
         public override void Generation()

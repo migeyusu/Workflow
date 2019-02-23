@@ -21,7 +21,7 @@ namespace WorkflowFacilities.Persistent
         /// <summary>
         /// 模板类类型
         /// </summary>
-        public string TemplateClassTypeName { get; set; }
+        public string CodeTemplateName { get; set; }
 
         public virtual RunningActivityModel StartActivityModel { get; set; }
 
@@ -29,7 +29,7 @@ namespace WorkflowFacilities.Persistent
 
         public StateMachineTemplateModel()
         {
-            RunningActivityModels=new List<RunningActivityModel>();
+            RunningActivityModels = new List<RunningActivityModel>();
         }
     }
 }

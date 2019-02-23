@@ -20,8 +20,14 @@ namespace WorkflowFacilities.Consumer
 
     public abstract class StateMachineTemplate
     {
+        /// <summary>
+        /// 版本号，必须在构造函数结束前定义，可以在重构后更改
+        /// </summary>
         public Guid Version { get; set; }
 
+        /// <summary>
+        /// 模板名，必须在构造函数结束前定义，禁止在此后的重构中更改
+        /// </summary>
         public string Name { get; set; }
 
         public List<State> States { get; set; }
