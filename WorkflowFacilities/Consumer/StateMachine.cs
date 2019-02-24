@@ -33,11 +33,8 @@ namespace WorkflowFacilities.Consumer
 
         internal PipelineContext Context { get; set; }
 
-        internal Action<PipelineContext> InitializeAction { get; set; }
-
-        internal StateMachine(Action<PipelineContext> initializeAction)
+        internal StateMachine()
         {
-            this.InitializeAction = initializeAction;
         }
 
 

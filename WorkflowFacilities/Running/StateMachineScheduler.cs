@@ -113,9 +113,8 @@ namespace WorkflowFacilities.Running
         /// <summary>
         /// 运行初始化后的
         /// </summary>
-        /// <param name="stateMachine"></param>
-        /// <param name="param">运行前输入参数</param>
-        public void Run()
+        /// <param name="dictionary"></param>
+        public void Run(IDictionary<string, string> dictionary = null)
         {
             if (_stateMachine.IsCompleted) {
                 throw new ArgumentException("不能运行已经结束的statemachine！");
@@ -123,7 +122,11 @@ namespace WorkflowFacilities.Running
 
             //first run
             if (!_context.IsRunning) {
-                _stateMachine.InitializeAction?.Invoke(_context);
+                if (dictionary != null)
+                    foreach (var pair in dictionary) {
+                        _context.LocalVariableDictionary.TryAdd(pair.Key, pair.Value);
+                    }
+
                 InternalRun(_stateMachine.ExecuteActivityChainEntry, _stateMachine.Context);
                 _context.IsRunning = true;
             }
@@ -164,7 +167,6 @@ namespace WorkflowFacilities.Running
                 }
 
                 if (context.IsWaiting) {
-                    
                     context.InternalRequestHangUp(activity);
                     context.IsWaiting = false;
                     return;

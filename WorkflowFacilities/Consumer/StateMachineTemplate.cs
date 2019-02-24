@@ -52,10 +52,5 @@ namespace WorkflowFacilities.Consumer
         /// 创建activity实例
         /// </summary>
         public abstract void Generation();
-        
-        /// <summary>
-        /// new instance initialize
-        /// </summary>
-        public abstract void Initialize(PipelineContext pipelineContext);
     }
 }
