@@ -97,7 +97,7 @@ namespace WorkflowFacilities.Persistent
             var binaryFormatter = new BinaryFormatter();
             using (var memoryStream = new MemoryStream()) {
                 binaryFormatter.Serialize(memoryStream, dictionary);
-                stateMachineModel.LocalVariousDictionary = Encoding.Unicode.GetString(memoryStream.ToArray());
+                stateMachineModel.LocalVariousDictionary = memoryStream.ToArray();
             }
 
             var @select = stateMachineContext.SuspendedActivities.Values
@@ -121,7 +121,7 @@ namespace WorkflowFacilities.Persistent
             var binaryFormatter = new BinaryFormatter();
             using (var memoryStream = new MemoryStream()) {
                 binaryFormatter.Serialize(memoryStream, stateMachineContext.LocalVariableDictionary);
-                stateMachineModel.LocalVariousDictionary = Encoding.Unicode.GetString(memoryStream.ToArray());
+                stateMachineModel.LocalVariousDictionary = memoryStream.ToArray();
             }
 
             stateMachineModel.SuspendedActivityModels.Clear();
@@ -174,8 +174,7 @@ namespace WorkflowFacilities.Persistent
                 SuspendedActivities = activities
             };
             var binaryFormatter = new BinaryFormatter();
-            var bytes = Encoding.Unicode.GetBytes(stateMachineModel.LocalVariousDictionary);
-            using (var memoryStream = new MemoryStream(bytes)) {
+            using (var memoryStream = new MemoryStream(stateMachineModel.LocalVariousDictionary)) {
                 var dictionary = binaryFormatter.Deserialize(memoryStream) as ConcurrentDictionary<string, string>;
                 pipelineContext.LocalVariableDictionary = dictionary;
             }

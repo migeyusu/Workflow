@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WorkflowFacilities.Persistent
 {
@@ -22,7 +23,7 @@ namespace WorkflowFacilities.Persistent
 
         public bool IsRunning { get; set; }
 
-        public string LocalVariousDictionary { get; set; }
+        public byte[] LocalVariousDictionary { get; set; }
 
         public virtual List<RunningActivityModel> SuspendedActivityModels { get; set; }
 
