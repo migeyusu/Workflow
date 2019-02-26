@@ -20,8 +20,6 @@ namespace WorkflowFacilities.Persistent
 
         public string DisplayName { get; set; }
 
-        public string Bookmark { get; set; }
-
         public virtual List<RunningActivityModel> RunningActivityModels { get; set; }
 
         public RunningActivityModel()

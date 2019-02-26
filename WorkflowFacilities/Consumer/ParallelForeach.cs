@@ -13,14 +13,14 @@ namespace WorkflowFacilities.Consumer
     {
         public BaseCodeActivity Body { get; set; }
 
-        public Func<IEnumerable<string>> GetSource {
-            get { return _getSource; }
-            set { _getSource = value; }
-        }
+        private readonly Func<IEnumerable<string>> _getSourceFunc;
 
-        private Func<IEnumerable<string>> _getSource;
+        private readonly string _itemName;
 
-        private string _itemName;
+        private List<string> _sourceList;
+
+        //loop count in memory
+        private int _currentLoop;
 
         /// <summary>
         /// 
@@ -29,38 +29,8 @@ namespace WorkflowFacilities.Consumer
         /// <param name="itemName">loop itemname</param>
         public ParallelForeach(Func<IEnumerable<string>> getSource, string itemName)
         {
-            _getSource = getSource ?? throw new ArgumentNullException("getSource mustn't be null");
+            _getSourceFunc = getSource ?? throw new ArgumentNullException("getSource mustn't be null");
             _itemName = itemName;
-        }
-
-        internal override IExecuteActivity InternalTranslate(IExecuteActivity executeActivity)
-        {
-            //形成三角循环--
-            var loopStart = new LoopStart();
-            var loopEnd = new LoopEnd();
-            executeActivity.NextActivities.Add(loopStart);
-            var internalTranslate = Body.InternalTranslate(loopStart);
-            internalTranslate.NextActivities.Add(loopEnd);
-            loopEnd.NextActivities.Add(loopStart);
-            return loopEnd;
-        }
-    }
-
-
-    public class ParallelForeachEntry : BaseExecuteActivity
-    {
-        private readonly Func<IEnumerable<string>> _getSourceFunc;
-
-        private string _itemName;
-
-        private List<string> _sourceList;
-
-        private int _currentLoop;
-
-        public ParallelForeachEntry(Func<IEnumerable<string>> getSourceFunc, string itemName)
-        {
-            this._getSourceFunc = getSourceFunc;
-            this._itemName = itemName;
         }
 
         public override bool Execute(PipelineContext context)
@@ -76,27 +46,24 @@ namespace WorkflowFacilities.Consumer
                 //stop loop
                 return false;
             }
-            else {
-                
-                _currentLoop++;
-            }
 
+            context.Set(_itemName, _sourceList[_currentLoop]);
+            _currentLoop++;
             return true;
         }
-    }
 
-    public class ParallelForeachLoopEnd : BaseExecuteActivity
-    {
-        public ParallelForeachLoopEnd()
-        { }
-    }
-
-
-    public class ParallelForeachExit : BaseExecuteActivity
-    {
-        public override bool Execute(PipelineContext context)
+        internal override IExecuteActivity InternalTranslate(IExecuteActivity executeActivity)
         {
-            return base.Execute(context);
+            //形成循环--
+            var loopStart = new ParallelForeachEntry(this);
+            executeActivity.NextActivities.Add(loopStart);
+            var loopEnd = new ParallelForeachLoopEnd();
+            loopStart.NextActivities.Add(loopEnd);
+            var internalTranslate = Body.InternalTranslate(loopEnd);
+            var parallelEndActivity = new ParallelEndActivity() {Version = this.Version};
+            internalTranslate.NextActivities.Add(parallelEndActivity);
+            loopEnd.NextActivities.Add(loopStart);
+            return parallelEndActivity;
         }
     }
 }

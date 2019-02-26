@@ -32,10 +32,10 @@ namespace ConsoleApp1
                 return true;
             }), null) {Version = Guid.Parse("5AD03706-F349-4559-A8DD-FB881D0E9466")};
             var readIntActivity = new CodeActivity(context => {
-                    context.WaitOn("");
+                    context.WaitOn("EnterGuess");
                     return true;
-                }, (context, s, arg3) => context.Set("Guess",arg3.ToString()))
-                { Bookmark = "EnterGuess", Version = Guid.Parse("B06E8F2F-37FD-4B18-8744-55285FB4EA1B")};
+                }, (context, s, arg3) => context.Set("Guess", arg3.ToString()))
+                {Version = Guid.Parse("B06E8F2F-37FD-4B18-8744-55285FB4EA1B")};
 
             var activity1 = new CodeActivity((context => {
                 var s = int.Parse(context.Get("Guess"));
@@ -96,6 +96,5 @@ namespace ConsoleApp1
 
             StartState = initializeState;
         }
-
     }
 }

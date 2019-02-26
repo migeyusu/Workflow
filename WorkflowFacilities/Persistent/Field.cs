@@ -93,7 +93,7 @@ namespace WorkflowFacilities.Persistent
                 IsCompleted = stateMachineContext.IsCompleted,
                 IsRunning = stateMachineContext.IsRunning,
             };
-            var dictionary = stateMachineContext.LocalVariableDictionary;
+            var dictionary = stateMachineContext.PersistableLocals;
             var binaryFormatter = new BinaryFormatter();
             using (var memoryStream = new MemoryStream()) {
                 binaryFormatter.Serialize(memoryStream, dictionary);
@@ -106,8 +106,11 @@ namespace WorkflowFacilities.Persistent
                     RunningActivityModel =
                         stateMachineTemplateModel.RunningActivityModels.First(
                             model => model.Id == keyvaluepair.Value.Id)
-                });
-            stateMachineModel.SuspendedRunningActivityModels.AddRange(select);
+                }).ToArray();
+            if (@select.Any()) {
+                _workflowDbContext.SuspendedRunningActivityModels.AddRange(select);
+                stateMachineModel.SuspendedRunningActivityModels.AddRange(select);
+            }
             _workflowDbContext.StateMachineModels.Add(stateMachineModel);
         }
 
@@ -124,7 +127,7 @@ namespace WorkflowFacilities.Persistent
             stateMachineModel.IsRunning = stateMachineContext.IsRunning;
             var binaryFormatter = new BinaryFormatter();
             using (var memoryStream = new MemoryStream()) {
-                binaryFormatter.Serialize(memoryStream, stateMachineContext.LocalVariableDictionary);
+                binaryFormatter.Serialize(memoryStream, stateMachineContext.PersistableLocals);
                 stateMachineModel.LocalVariousDictionary = memoryStream.ToArray();
             }
 
@@ -135,7 +138,8 @@ namespace WorkflowFacilities.Persistent
                     BookmarkName = pair.Key,
                     RunningActivityModel =
                         stateMachineTemplateModel.RunningActivityModels.First(model => model.Id == pair.Value.Id)
-                });
+                }).ToArray();
+            _workflowDbContext.SuspendedRunningActivityModels.AddRange(suspendedActivityModels);
             stateMachineModel.SuspendedRunningActivityModels.AddRange(suspendedActivityModels);
         }
 
@@ -183,7 +187,7 @@ namespace WorkflowFacilities.Persistent
             var binaryFormatter = new BinaryFormatter();
             using (var memoryStream = new MemoryStream(stateMachineModel.LocalVariousDictionary)) {
                 var dictionary = binaryFormatter.Deserialize(memoryStream) as ConcurrentDictionary<string, string>;
-                pipelineContext.LocalVariableDictionary = dictionary;
+                pipelineContext.PersistableLocals = dictionary;
             }
 
             var stateMachine = new StateMachine() {

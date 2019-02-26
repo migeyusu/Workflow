@@ -15,7 +15,7 @@ namespace WorkflowFacilities.Consumer
     {
         public State To { get; set; }
 
-        public ICustomActivity Aciton { get; set; }
+        public BaseCodeActivity Aciton { get; set; }
 
         public Func<PipelineContext,bool> ConditionFunc;
 

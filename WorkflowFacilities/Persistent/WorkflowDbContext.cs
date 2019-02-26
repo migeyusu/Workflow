@@ -20,9 +20,9 @@ namespace WorkflowFacilities.Persistent
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<StateMachineModel>()
+            /*modelBuilder.Entity<StateMachineModel>()
                 .HasMany((s) => s.SuspendedActivityModels)
-                .WithMany();
+                .WithMany();*/
 //                .WithRequired()
 //                .HasForeignKey(model => model.Id);
             modelBuilder.Entity<StateMachineTemplateModel>()

@@ -36,7 +36,7 @@ namespace WorkflowFacilities.Consumer
 
         public List<TransitionPath> TransitionPaths { get; set; }
 
-        public List<ICustomActivity> CustomActivities { get; set; }
+        public List<BaseCodeActivity> CustomActivities { get; set; }
 
         public State StartState { get; set; }
 
@@ -45,7 +45,7 @@ namespace WorkflowFacilities.Consumer
             this.States = new List<State>();
             this.Transitions = new List<Transition>();
             this.TransitionPaths = new List<TransitionPath>();
-            this.CustomActivities = new List<ICustomActivity>();
+            this.CustomActivities = new List<BaseCodeActivity>();
         }
         
         /// <summary>

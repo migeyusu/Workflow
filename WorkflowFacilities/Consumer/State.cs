@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Metadata.Edm;
 using WorkflowFacilities.Running;
 
 namespace WorkflowFacilities.Consumer
@@ -9,9 +10,9 @@ namespace WorkflowFacilities.Consumer
     /// </summary>
     public class State
     {
-        public ICustomActivity Entry { get; set; }
+        public BaseCodeActivity Entry { get; set; }
 
-        public ICustomActivity Exit { get; set; }
+        public BaseCodeActivity Exit { get; set; }
 
         public List<Transition> Transitions { get; set; }
 
@@ -35,29 +36,12 @@ namespace WorkflowFacilities.Consumer
             mapping.Add(this, stateEmptyExecuteActivity);
             activity.NextActivities.Add(stateEmptyExecuteActivity);
             activity = stateEmptyExecuteActivity;
-            var entry = this.Entry;
-            if (entry != null) {
-                var customExecuteActivity = new CustomExecuteActivity(entry);
-                activity.NextActivities.Add(customExecuteActivity);
-                activity = customExecuteActivity;
-            }
-
-            var exit = this.Exit;
-            if (exit != null) {
-                var customExecuteActivity = new CustomExecuteActivity(exit);
-                activity.NextActivities.Add(customExecuteActivity);
-                activity = customExecuteActivity;
-            }
-
+            activity = Entry != null ? Entry.InternalTranslate(activity) : activity;
+            activity = Exit != null ? Exit.InternalTranslate(activity) : activity;
             foreach (var transition in this.Transitions) {
                 var endActivity = activity;
                 var trigger = transition.Trigger;
-                if (trigger != null) {
-                    var customExecuteActivity = new CustomExecuteActivity(trigger);
-                    endActivity.NextActivities.Add(customExecuteActivity);
-                    endActivity = customExecuteActivity;
-                }
-
+                endActivity = trigger != null ? trigger.InternalTranslate(endActivity) : endActivity;
                 foreach (var path in transition.TransitionPaths) {
                     var pathConditionFunc = path.ConditionFunc;
                     var pathactivity = endActivity;
@@ -70,12 +54,7 @@ namespace WorkflowFacilities.Consumer
                     }
 
                     var action = path.Aciton;
-                    if (action != null) {
-                        var customExecuteActivity = new CustomExecuteActivity(action);
-                        pathactivity.NextActivities.Add(customExecuteActivity);
-                        pathactivity = customExecuteActivity;
-                    }
-
+                    pathactivity = action != null ? action.InternalTranslate(pathactivity) : pathactivity;
                     var pathTo = path.To;
                     if (mapping.TryGetValue(pathTo, out var nextExecuteActivity)) {
                         pathactivity.NextActivities.Add(nextExecuteActivity);

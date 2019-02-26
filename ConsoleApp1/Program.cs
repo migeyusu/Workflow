@@ -21,12 +21,12 @@ namespace ConsoleApp1
         {
             new WorkflowFact().Register<NumberguessTemplate>();
             
-           //StateMachine stateMachine;
-           // using (var openField = WorkflowFact.OpenField("WorkflowDb")) {
-           //     openField.CheckUpdates();
-           //     stateMachine = openField.NewStateMachine<NumberguessTemplate>();
-           //     openField.SaveChanges();
-           // }
+           StateMachine stateMachine;
+            using (var openField = WorkflowFact.OpenField("WorkflowDb")) {
+                openField.CheckUpdates();
+                stateMachine = openField.NewStateMachine<NumberguessTemplate>();
+                openField.SaveChanges();
+            }
            // var stateMachineScheduler = new StateMachineScheduler(stateMachine);
            // var completed = false;
            // stateMachineScheduler.OnCompleted += () => { completed = true; };
@@ -58,14 +58,14 @@ namespace ConsoleApp1
                 }
             }*/
 
-            using (var openField = WorkflowFact.OpenField("WorkflowDb"))
+            /*using (var openField = WorkflowFact.OpenField("WorkflowDb"))
             {
                 var findStateMachine = openField.Get(Guid.Parse("894FE322-332F-43C7-B2C2-904523B07796"));
                 var machineScheduler = new StateMachineScheduler(findStateMachine);
                 machineScheduler.ResumeBookmark("EnterGuess", 9.ToString());
                 openField.Update(findStateMachine);
                 openField.SaveChanges();
-            }
+            }*/
   
             Console.ReadKey();
         }

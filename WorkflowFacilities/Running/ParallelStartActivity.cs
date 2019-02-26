@@ -5,7 +5,7 @@
     public class ParallelStartActivity : BaseExecuteActivity
     {
         private const string ParallelStartString = "ParallelStart";
-
+        
         public ParallelStartActivity()
         {
             this.ActivityType = RunningActivityType.ParallelStart;

@@ -85,6 +85,18 @@
     <Compile Include="Migrations\201902250707575_addsuspend.Designer.cs">
       <DependentUpon>201902250707575_addsuspend.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201902260745370_removebookmark.cs" />
+    <Compile Include="Migrations\201902260745370_removebookmark.Designer.cs">
+      <DependentUpon>201902260745370_removebookmark.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902260747000_deletesuspend.cs" />
+    <Compile Include="Migrations\201902260747000_deletesuspend.Designer.cs">
+      <DependentUpon>201902260747000_deletesuspend.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902260748164_addsuspend1.cs" />
+    <Compile Include="Migrations\201902260748164_addsuspend1.Designer.cs">
+      <DependentUpon>201902260748164_addsuspend1.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Persistent\StateMachineTemplateModel.cs" />
     <Compile Include="Persistent\SuspendedRunningActivityModel.cs" />
@@ -100,6 +112,8 @@
     <Compile Include="Running\IRunningModel.cs" />
     <Compile Include="Consumer\ParallelActivity.cs" />
     <Compile Include="Running\ParallelEndActivity.cs" />
+    <Compile Include="Running\ParallelForeachEntry.cs" />
+    <Compile Include="Running\ParallelForeachLoopEnd.cs" />
     <Compile Include="Running\ParallelStartActivity.cs" />
     <Compile Include="Running\PipelineContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -142,6 +156,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201902250707575_addsuspend.resx">
       <DependentUpon>201902250707575_addsuspend.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902260745370_removebookmark.resx">
+      <DependentUpon>201902260745370_removebookmark.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902260747000_deletesuspend.resx">
+      <DependentUpon>201902260747000_deletesuspend.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902260748164_addsuspend1.resx">
+      <DependentUpon>201902260748164_addsuspend1.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

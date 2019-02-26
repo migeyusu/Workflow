@@ -31,12 +31,14 @@ namespace WorkflowFacilities.Running
             _callbackAction?.Invoke(context);
         }
     }*/
+
     public class CustomExecuteActivity : BaseExecuteActivity
     {
         private const string CustomString = "Custom";
 
         private readonly ICustomActivity _customActivity;
 
+    
         public CustomExecuteActivity(ICustomActivity customActivity)
         {
             this._customActivity = customActivity;

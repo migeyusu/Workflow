@@ -61,7 +61,7 @@ namespace WorkflowFacilities.Running
 
             if (dictionary != null) {
                 foreach (var pair in dictionary) {
-                    _context.LocalVariableDictionary.TryAdd(pair.Key, pair.Value);
+                    _context.PersistableLocals.TryAdd(pair.Key, pair.Value);
                 }
             }
 
@@ -86,7 +86,6 @@ namespace WorkflowFacilities.Running
 
             if (context.IsWaiting) {
                 context.InternalRequestHangUp(activity);
-                context.IsWaiting = false;
                 return;
             }
 
@@ -116,34 +115,38 @@ namespace WorkflowFacilities.Running
             }
         }
 
+        /// <summary>
+        /// generate running chain, some of them are different from translated
+        /// </summary>
+        /// <param name="activityModel"></param>
+        /// <param name="cache"></param>
+        /// <param name="template"></param>
+        /// <returns></returns>
         internal static IExecuteActivity Deserialize(RunningActivityModel activityModel,
             IDictionary<Guid, IExecuteActivity> cache, StateMachineTemplate template)
         {
             IExecuteActivity executeActivity;
+            var activityModelVersion = activityModel.Version;
             switch (activityModel.ActivityType) {
                 case RunningActivityType.Condition:
                     var transitionPath =
-                        template.TransitionPaths.FirstOrDefault(path => path.Version == activityModel.Version);
+                        template.TransitionPaths.FirstOrDefault(path => path.Version == activityModelVersion);
                     if (transitionPath == null) {
                         throw new ObjectNotFoundException(
-                            $"无法从模板{template.Name}找到version为{activityModel.Version}的transitionpath！");
+                            $"无法从模板{template.Name}找到version为{activityModelVersion}的transitionpath！");
                     }
 
                     executeActivity = new ConditionActivity(transitionPath.ConditionFunc);
                     break;
                 case RunningActivityType.Custom:
                     var customActivity = template.CustomActivities.FirstOrDefault(
-                        activity => activity.Version == activityModel.Version);
+                        activity => activity.Version == activityModelVersion);
                     if (customActivity == null) {
                         throw new ObjectNotFoundException(
-                            $"无法从模板{template.Name}找到version为{activityModel.Version}的activity！");
+                            $"无法从模板{template.Name}找到version为{activityModelVersion}的activity！");
                     }
 
-                    executeActivity =
-                        new CustomExecuteActivity(customActivity) {
-                            Version = activityModel.Version,
-                            DisplayName = activityModel.DisplayName,
-                        };
+                    executeActivity = new CustomExecuteActivity(customActivity);
                     break;
                 case RunningActivityType.Set:
                     executeActivity = new StateSetExecuteActivity() {
@@ -152,6 +155,21 @@ namespace WorkflowFacilities.Running
                     break;
                 case RunningActivityType.Start:
                     executeActivity = new StartActiviy();
+                    break;
+                case RunningActivityType.ParallelStart:
+                    executeActivity = new ParallelStartActivity() {Version = activityModelVersion,};
+                    break;
+                case RunningActivityType.ParallelEnd:
+                    executeActivity = new ParallelEndActivity() {Version = activityModelVersion};
+                    break;
+                case RunningActivityType.ParallelForeachEnty:
+                    var parallelForeach = template.CustomActivities
+                            .FirstOrDefault(activity => activity.Version == activityModelVersion)
+                        as ParallelForeach;
+                    executeActivity = new ParallelForeachEntry(parallelForeach);
+                    break;
+                case RunningActivityType.ParallelForeachLoopEnd:
+                    executeActivity = new ParallelForeachLoopEnd();
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

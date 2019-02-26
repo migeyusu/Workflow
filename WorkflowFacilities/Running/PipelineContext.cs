@@ -27,12 +27,12 @@ namespace WorkflowFacilities.Running
         internal string WaitingBookmark { get; set; }
 
         /// <summary>
-        /// 用于内部activity控制
+        /// 用于内部activity
         /// </summary>
-        internal ConcurrentDictionary<string, string> InternalVariableDictionary { get; set; } =
-            new ConcurrentDictionary<string, string>();
+        internal ConcurrentDictionary<string, object> InternalPipe { get; set; } =
+            new ConcurrentDictionary<string, object>();
 
-        internal ConcurrentDictionary<string, string> LocalVariableDictionary { get; set; } =
+        internal ConcurrentDictionary<string, string> PersistableLocals { get; set; } =
             new ConcurrentDictionary<string, string>();
 
         internal Dictionary<string, IExecuteActivity> SuspendedActivities { get; set; } =
@@ -40,17 +40,17 @@ namespace WorkflowFacilities.Running
 
         public void Set(string name, string value)
         {
-            LocalVariableDictionary.AddOrUpdate(name, s => value, (s, s1) => value);
+            PersistableLocals.AddOrUpdate(name, s => value, (s, s1) => value);
         }
 
         public string Get(string name)
         {
-            return LocalVariableDictionary.TryGetValue(name, out var value) ? value : string.Empty;
+            return PersistableLocals.TryGetValue(name, out var value) ? value : string.Empty;
         }
 
         public void Remove(string key)
         {
-            LocalVariableDictionary.TryRemove(key, out var value);
+            PersistableLocals.TryRemove(key, out var value);
         }
 
         internal void InternalRequestHangUp(IExecuteActivity activity)

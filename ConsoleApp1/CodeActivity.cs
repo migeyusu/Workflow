@@ -4,14 +4,8 @@ using WorkflowFacilities.Running;
 
 namespace ConsoleApp1
 {
-    public class CodeActivity : ICustomActivity
+    public class CodeActivity : BaseCodeActivity
     {
-        public Guid Version { get; set; }
-
-        public string DisplayName { get; set; }
-
-        public string Bookmark { get; set; }
-
         private readonly Func<PipelineContext, bool> _executeFunc;
 
         private readonly Action<PipelineContext,string,object> _callbackAction;
@@ -22,12 +16,12 @@ namespace ConsoleApp1
             _executeFunc = executeFunc;
         }
 
-        public bool Execute(PipelineContext context)
+        public override bool Execute(PipelineContext context)
         {
             return _executeFunc == null || _executeFunc(context);
         }
 
-        public void BookmarkCallback(PipelineContext context, string bookmarkName, object value)
+        public override void BookmarkCallback(PipelineContext context, string bookmarkName, object value)
         {
             _callbackAction?.Invoke(context,bookmarkName,value);
         }

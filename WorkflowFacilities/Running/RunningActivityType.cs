@@ -13,6 +13,10 @@
         ParallelStart = 16,
 
         ParallelEnd = 32,
-        
+
+        ParallelForeachEnty = 64,
+
+        ParallelForeachLoopEnd = 128,
+//        ParallelForeachExit = 256,
     }
 }

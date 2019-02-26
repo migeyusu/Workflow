@@ -16,7 +16,7 @@ namespace WorkflowFacilities.Consumer
         /// </summary>
         public Guid Version { get; set; }
 
-        public ICustomActivity Trigger { get; set; }
+        public BaseCodeActivity Trigger { get; set; }
 
         public Transition()
         {
