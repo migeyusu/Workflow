@@ -13,11 +13,12 @@ namespace WorkflowFacilities.Consumer
             Activities = new List<BaseCodeActivity>();
         }
 
-        internal override IExecuteActivity InternalTranslate(IExecuteActivity executeActivity)
+        internal override IExecuteActivity InternalTranslate(IExecuteActivity executeActivity,
+            IDictionary<Guid, IExecuteActivity> stateMapping)
         {
             var inputExecuteActivity = executeActivity;
             foreach (var customActivity in Activities) {
-                inputExecuteActivity = customActivity.InternalTranslate(inputExecuteActivity);
+                inputExecuteActivity = customActivity.InternalTranslate(inputExecuteActivity,stateMapping);
             }
 
             return inputExecuteActivity as CustomExecuteActivity;

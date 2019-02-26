@@ -57,41 +57,37 @@ namespace ConsoleApp1
             var finalState = new State() {
                 DisplayName = "FinalState"
             };
-            States.AddRange(new[] {initializeState, enterState, finalState});
+            CustomActivities.AddRange(new[] {initializeState, enterState, finalState});
 
             //空transition和path理论上不需要加进去
             var transition = new Transition();
-            transition.TransitionPaths.Add(new TransitionPath {To = enterState});
+            transition.TransitionPaths.Add(new TransitionPath() {To = enterState});
             initializeState.Transitions.Add(transition);
             var transition1 = new Transition() {
                 Trigger = readIntActivity,
                 Version = Guid.Parse("2EF26ADC-3D0E-4DEA-9DFD-6E46D5979A87")
             };
-            var transitionPath = new TransitionPath() {
+            var transitionPath = new TransitionPath(context => {
+                var guess = context.Get("Guess");
+                var target = context.Get("Target");
+                return guess == target;
+            }) {
                 To = finalState,
-                ConditionFunc = context => {
-                    var guess = context.Get("Guess");
-                    var target = context.Get("Target");
-                    return guess == target;
-                },
                 Version = Guid.Parse("F8E6F16C-9FDF-47B4-845C-FFBD04DDD684")
             };
             transition1.TransitionPaths.Add(transitionPath);
-            var path = new TransitionPath() {
+            var path = new TransitionPath(context => {
+                var guess = context.Get("Guess");
+                var target = context.Get("Target");
+                return guess != target;
+            }) {
                 To = enterState,
-                ConditionFunc = context => {
-                    var guess = context.Get("Guess");
-                    var target = context.Get("Target");
-                    return guess != target;
-                },
-                Aciton = activity1,
+                Action = activity1,
                 Version = Guid.Parse("FC7A3F25-0577-42CD-B706-B79A96108415")
             };
             transition1.TransitionPaths.Add(path);
             enterState.Transitions.Add(transition1);
-
-            TransitionPaths.AddRange(new[] {transitionPath, path});
-
+            CustomActivities.AddRange(new[] {transitionPath, path});
             StartState = initializeState;
         }
     }

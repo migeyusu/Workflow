@@ -29,19 +29,13 @@ namespace WorkflowFacilities.Consumer
         /// 模板名，必须在构造函数结束前定义，禁止在此后的重构中更改
         /// </summary>
         public string Name { get; set; }
-
-        public List<State> States { get; set; }
         
-        public List<TransitionPath> TransitionPaths { get; set; }
-
         public List<BaseCodeActivity> CustomActivities { get; set; }
 
         public State StartState { get; set; }
 
         protected StateMachineTemplate()
         {
-            this.States = new List<State>();
-            this.TransitionPaths = new List<TransitionPath>();
             this.CustomActivities = new List<BaseCodeActivity>();
         }
         

@@ -38,7 +38,6 @@ namespace WorkflowFacilities.Running
 
         private readonly ICustomActivity _customActivity;
 
-    
         public CustomExecuteActivity(ICustomActivity customActivity)
         {
             this._customActivity = customActivity;

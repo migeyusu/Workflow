@@ -52,14 +52,15 @@ namespace WorkflowFacilities.Consumer
             return true;
         }
 
-        internal override IExecuteActivity InternalTranslate(IExecuteActivity executeActivity)
+        internal override IExecuteActivity InternalTranslate(IExecuteActivity executeActivity,
+            IDictionary<Guid, IExecuteActivity> stateMapping)
         {
             //形成循环--
             var loopStart = new ParallelForeachEntry(this);
             executeActivity.NextActivities.Add(loopStart);
             var loopEnd = new ParallelForeachLoopEnd();
             loopStart.NextActivities.Add(loopEnd);
-            var internalTranslate = Body.InternalTranslate(loopEnd);
+            var internalTranslate = Body.InternalTranslate(loopEnd,stateMapping);
             var parallelEndActivity = new ParallelEndActivity() {Version = this.Version};
             internalTranslate.NextActivities.Add(parallelEndActivity);
             loopEnd.NextActivities.Add(loopStart);

@@ -71,8 +71,4 @@ namespace ConsoleApp1
         }
     }
 
-    public class New:BaseCodeActivity
-    {
-        
-    }
 }

@@ -8,7 +8,8 @@ namespace WorkflowFacilities.Consumer
     {
         public List<BaseCodeActivity> Activities { get; set; }
 
-        internal override IExecuteActivity InternalTranslate(IExecuteActivity executeActivity)
+        internal override IExecuteActivity InternalTranslate(IExecuteActivity executeActivity,
+            IDictionary<Guid, IExecuteActivity> stateMapping)
         {
             var sync = Guid.NewGuid();
             //并行同步，本质上是过滤器，等全部都执行完后放行

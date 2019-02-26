@@ -38,7 +38,7 @@ namespace WorkflowFacilities.Running
          */
         public static StartActiviy Translate(StateMachineTemplate stateMachine)
         {
-            var activitiesMapping = new Dictionary<State, IExecuteActivity>();
+            var activitiesMapping = new Dictionary<Guid, IExecuteActivity>();
             var startActivity = new StartActiviy();
             stateMachine.StartState.InternalTranslate(startActivity, activitiesMapping);
             return startActivity;
@@ -130,13 +130,13 @@ namespace WorkflowFacilities.Running
             switch (activityModel.ActivityType) {
                 case RunningActivityType.Condition:
                     var transitionPath =
-                        template.TransitionPaths.FirstOrDefault(path => path.Version == activityModelVersion);
+                        template.CustomActivities.FirstOrDefault(path => path.Version == activityModelVersion);
                     if (transitionPath == null) {
                         throw new ObjectNotFoundException(
                             $"无法从模板{template.Name}找到version为{activityModelVersion}的transitionpath！");
                     }
 
-                    executeActivity = new ConditionActivity(transitionPath.ConditionFunc);
+                    executeActivity = new ConditionActivity(transitionPath);
                     break;
                 case RunningActivityType.Custom:
                     var customActivity = template.CustomActivities.FirstOrDefault(
