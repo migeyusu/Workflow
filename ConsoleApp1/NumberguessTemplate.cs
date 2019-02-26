@@ -67,8 +67,6 @@ namespace ConsoleApp1
                 Trigger = readIntActivity,
                 Version = Guid.Parse("2EF26ADC-3D0E-4DEA-9DFD-6E46D5979A87")
             };
-            Transitions.AddRange(new[] {transition1});
-
             var transitionPath = new TransitionPath() {
                 To = finalState,
                 ConditionFunc = context => {

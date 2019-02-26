@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkflowFacilities", "WorkflowFacilities\WorkflowFacilities.csproj", "{1F952863-D6B3-4640-85C9-57FEB1A1D2C9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkflowConsoleApplication1", "WorkflowConsoleApplication1\WorkflowConsoleApplication1.csproj", "{55361D67-6DCC-434F-AAE6-F2CC0A8D162A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,12 @@ Global
 		{1F952863-D6B3-4640-85C9-57FEB1A1D2C9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1F952863-D6B3-4640-85C9-57FEB1A1D2C9}.Release|x86.ActiveCfg = Release|Any CPU
 		{1F952863-D6B3-4640-85C9-57FEB1A1D2C9}.Release|x86.Build.0 = Release|Any CPU
+		{55361D67-6DCC-434F-AAE6-F2CC0A8D162A}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{55361D67-6DCC-434F-AAE6-F2CC0A8D162A}.Debug|x86.ActiveCfg = Debug|x86
+		{55361D67-6DCC-434F-AAE6-F2CC0A8D162A}.Debug|x86.Build.0 = Debug|x86
+		{55361D67-6DCC-434F-AAE6-F2CC0A8D162A}.Release|Any CPU.ActiveCfg = Release|x86
+		{55361D67-6DCC-434F-AAE6-F2CC0A8D162A}.Release|x86.ActiveCfg = Release|x86
+		{55361D67-6DCC-434F-AAE6-F2CC0A8D162A}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

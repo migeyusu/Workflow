@@ -38,6 +38,8 @@ namespace WorkflowFacilities.Running
         internal Dictionary<string, IExecuteActivity> SuspendedActivities { get; set; } =
             new Dictionary<string, IExecuteActivity>();
 
+        
+
         public void Set(string name, string value)
         {
             PersistableLocals.AddOrUpdate(name, s => value, (s, s1) => value);

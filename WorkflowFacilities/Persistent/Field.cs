@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Entity.Core;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Management.Instrumentation;
@@ -43,7 +44,7 @@ namespace WorkflowFacilities.Persistent
                             .Serialize(startActivity, runningActivityModels),
                         RunningActivityModels = runningActivityModels.Values.ToList()
                     };
-                });
+                }).ToArray();
             _workflowDbContext.ActivityModels.AddRange(runningActivityModels.Values);
             _workflowDbContext.StateMachineTemplateModels.AddRange(insertTemplateModels);
         }

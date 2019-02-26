@@ -19,13 +19,13 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            new WorkflowFact().Register<NumberguessTemplate>();
             
-           StateMachine stateMachine;
+            new WorkflowFact().Register<NumberguessTemplate>();
+            StateMachine stateMachine;
             using (var openField = WorkflowFact.OpenField("WorkflowDb")) {
                 openField.CheckUpdates();
-                stateMachine = openField.NewStateMachine<NumberguessTemplate>();
-                openField.SaveChanges();
+//                stateMachine = openField.NewStateMachine<NumberguessTemplate>();
+                openField.SaveChanges(); 
             }
            // var stateMachineScheduler = new StateMachineScheduler(stateMachine);
            // var completed = false;

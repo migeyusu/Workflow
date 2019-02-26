@@ -1,24 +1,19 @@
 ﻿using System;
 using System.Linq;
 using System.Activities;
-using NumberGuessWorkflowHost;
 using System.Activities.Statements;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ServiceModel.Activities;
 using System.Threading;
-using System.Windows.Forms;
 using NumberGuessWorkflowActivities;
 
-namespace NumberGuessWorkflowHost
+namespace WorkflowConsoleApplication1
 {
+
     class Program
     {
         static void Main(string[] args)
         {
-//            Application.EnableVisualStyles();
-//            Application.Run(new WorkflowHostForm());
-            var inputs = new Dictionary<string, object>() {{"MaxNumber", 100}};
+              var inputs = new Dictionary<string, object>() {{"MaxNumber", 100}};
             var autoResetEvent = new AutoResetEvent(false);
             var idleEvent = new AutoResetEvent(false);
             var workflowApplication = new WorkflowApplication(new StateMachineNumberGuessWorkflow(), inputs) {
@@ -40,11 +35,11 @@ namespace NumberGuessWorkflowHost
                 }
             };
             workflowApplication.Run();
-//            var guess = int.Parse(Console.ReadKey()); 
+            var readLine = int.Parse(Console.ReadLine());
             foreach (var bookmarkInfo in workflowApplication.GetBookmarks()) {
                 Console.WriteLine(bookmarkInfo.BookmarkName);
             }
-            workflowApplication.ResumeBookmark("Guess2", 10);
+            workflowApplication.ResumeBookmark("Guess2", readLine);
             /*var handles = new WaitHandle[] {autoResetEvent, idleEvent};
             while (WaitHandle.WaitAny(handles) != 0) {
                 // Gather the user input and resume the bookmark.`
@@ -63,6 +58,8 @@ namespace NumberGuessWorkflowHost
                     }
                 }
             }*/
+            var line = Console.ReadLine();
+            Console.WriteLine(line);
             foreach (var bookmarkInfo in workflowApplication.GetBookmarks()) {
                 Console.WriteLine(bookmarkInfo.BookmarkName);
             }

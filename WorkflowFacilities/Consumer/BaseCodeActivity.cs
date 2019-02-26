@@ -24,7 +24,7 @@ namespace WorkflowFacilities.Consumer
         internal virtual IExecuteActivity InternalTranslate(IExecuteActivity executeActivity)
         {
             var customExecuteActivity = new CustomExecuteActivity(this);
-            executeActivity.NextActivities.Add(executeActivity);
+            executeActivity.NextActivities.Add(customExecuteActivity);
             return customExecuteActivity;
         }
     }

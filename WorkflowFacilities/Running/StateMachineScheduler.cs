@@ -106,7 +106,7 @@ namespace WorkflowFacilities.Running
                 throw new ArgumentNullException("bookmark不允许为空");
             }
 
-            if (_context.SuspendedActivities.TryGetValue(bookmark, out IExecuteActivity executeActivity)) {
+            if (_context.SuspendedActivities.TryGetValue(bookmark, out var executeActivity)) {
                 executeActivity.BookmarkCallback(_context, bookmark, value);
                 _context.SuspendedActivities.Remove(bookmark);
                 foreach (var nextActivity in executeActivity.NextActivities) {

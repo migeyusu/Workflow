@@ -31,9 +31,7 @@ namespace WorkflowFacilities.Consumer
         public string Name { get; set; }
 
         public List<State> States { get; set; }
-
-        public List<Transition> Transitions { get; set; }
-
+        
         public List<TransitionPath> TransitionPaths { get; set; }
 
         public List<BaseCodeActivity> CustomActivities { get; set; }
@@ -43,7 +41,6 @@ namespace WorkflowFacilities.Consumer
         protected StateMachineTemplate()
         {
             this.States = new List<State>();
-            this.Transitions = new List<Transition>();
             this.TransitionPaths = new List<TransitionPath>();
             this.CustomActivities = new List<BaseCodeActivity>();
         }
