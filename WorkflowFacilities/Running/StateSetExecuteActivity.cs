@@ -15,7 +15,8 @@ namespace WorkflowFacilities.Running
 
         public override bool Execute(PipelineContext context)
         {
-            context.CurrentStateName = this.Name;
+            //todo:在不同的state切换时可能需要清空bookmark
+            context.CurrentStateName = this.DisplayName;
             return true;
         }
     }

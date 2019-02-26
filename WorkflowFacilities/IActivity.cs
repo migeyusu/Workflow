@@ -13,6 +13,6 @@ namespace WorkflowFacilities
         /// </summary>
         Guid Version { get; set; }
 
-        string Name { get;set; }
+        string DisplayName { get;set; }
     }
 }

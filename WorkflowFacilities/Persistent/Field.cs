@@ -35,12 +35,12 @@ namespace WorkflowFacilities.Persistent
                 .Where(template => template != null && !guids.Contains(template.Version))
                 .Select(template => {
                     template.Generation();
-                    var startActiviy = StateMachineScheduler.Translate(template);
+                    var startActivity = StateMachineScheduler.Translate(template);
                     return new StateMachineTemplateModel {
                         Version = template.Version,
                         CodeTemplateName = template.Name,
                         StartActivityModel = StateMachineScheduler
-                            .Serialize(startActiviy, runningActivityModels),
+                            .Serialize(startActivity, runningActivityModels),
                         RunningActivityModels = runningActivityModels.Values.ToList()
                     };
                 });
@@ -65,7 +65,7 @@ namespace WorkflowFacilities.Persistent
                 Version = templateModel.Version,
                 Id = Guid.NewGuid(),
                 Context = new PipelineContext(),
-                Name = template.Name,
+                TemplateName = template.Name,
                 ExecuteActivityChainEntry = executeActivity,
             };
             return stateMachine;
@@ -81,13 +81,13 @@ namespace WorkflowFacilities.Persistent
             var stateMachineTemplateModel =
                 _workflowDbContext.StateMachineTemplateModels.Find(stateMachine.Version);
             if (stateMachineTemplateModel == null) {
-                throw new ObjectNotFoundException($"statemachine{stateMachine.Name}无法查询到指定的模板");
+                throw new ObjectNotFoundException($"statemachine{stateMachine.TemplateName}无法查询到指定的模板");
             }
 
             var stateMachineContext = stateMachine.Context;
             var stateMachineModel = new StateMachineModel {
                 Id = stateMachine.Id,
-                Name = stateMachine.Name,
+                Name = stateMachine.TemplateName,
                 TemplateModel = stateMachineTemplateModel,
                 CurrentStateName = stateMachineContext.CurrentStateName,
                 IsCompleted = stateMachineContext.IsCompleted,
@@ -100,10 +100,14 @@ namespace WorkflowFacilities.Persistent
                 stateMachineModel.LocalVariousDictionary = memoryStream.ToArray();
             }
 
-            var @select = stateMachineContext.SuspendedActivities.Values
-                .Select(activity =>
-                    stateMachineTemplateModel.RunningActivityModels.First(model => model.Id == activity.Id));
-            stateMachineModel.SuspendedActivityModels.AddRange(select);
+            var @select = stateMachineContext.SuspendedActivities
+                .Select(keyvaluepair => new SuspendedRunningActivityModel() {
+                    BookmarkName = keyvaluepair.Key,
+                    RunningActivityModel =
+                        stateMachineTemplateModel.RunningActivityModels.First(
+                            model => model.Id == keyvaluepair.Value.Id)
+                });
+            stateMachineModel.SuspendedRunningActivityModels.AddRange(select);
             _workflowDbContext.StateMachineModels.Add(stateMachineModel);
         }
 
@@ -124,12 +128,15 @@ namespace WorkflowFacilities.Persistent
                 stateMachineModel.LocalVariousDictionary = memoryStream.ToArray();
             }
 
-            stateMachineModel.SuspendedActivityModels.Clear();
+            stateMachineModel.SuspendedRunningActivityModels.Clear();
             var stateMachineTemplateModel = stateMachineModel.TemplateModel;
-            var suspendedActivityModels = stateMachineContext.SuspendedActivities.Values
-                .Select(activity =>
-                    stateMachineTemplateModel.RunningActivityModels.First(model => model.Id == activity.Id));
-            stateMachineModel.SuspendedActivityModels.AddRange(suspendedActivityModels);
+            var suspendedActivityModels = stateMachineContext.SuspendedActivities
+                .Select(pair => new SuspendedRunningActivityModel() {
+                    BookmarkName = pair.Key,
+                    RunningActivityModel =
+                        stateMachineTemplateModel.RunningActivityModels.First(model => model.Id == pair.Value.Id)
+                });
+            stateMachineModel.SuspendedRunningActivityModels.AddRange(suspendedActivityModels);
         }
 
         public void Delete(StateMachine stateMachine)
@@ -150,9 +157,10 @@ namespace WorkflowFacilities.Persistent
             }
 
             var templateModel = stateMachineModel.TemplateModel;
-            if (!WorkflowFact.AllTemplateTypes.TryGetValue(templateModel.CodeTemplateName,out var type)) {
+            if (!WorkflowFact.AllTemplateTypes.TryGetValue(templateModel.CodeTemplateName, out var type)) {
                 throw new KeyNotFoundException($"找不到名为{templateModel.CodeTemplateName}的模板类！");
             }
+
             var stateMachineTemplate =
                 Activator.CreateInstance(type ?? throw new TypeLoadException("数据库关联模板的代码已经变更，未找到指定类型")) as
                     StateMachineTemplate;
@@ -164,9 +172,8 @@ namespace WorkflowFacilities.Persistent
             var executeActivities = new Dictionary<Guid, IExecuteActivity>();
             var activity = StateMachineScheduler.Deserialize(templateModel.StartActivityModel, executeActivities,
                 stateMachineTemplate);
-            var activities = stateMachineModel.SuspendedActivityModels
-                .Select(model => executeActivities[model.Id])
-                .ToDictionary(executeActivity => executeActivity.Bookmark, executeActivity => executeActivity);
+            var activities = stateMachineModel.SuspendedRunningActivityModels
+                .ToDictionary(model => model.BookmarkName, model => executeActivities[model.RunningActivityModel.Id]);
             var pipelineContext = new PipelineContext() {
                 CurrentStateName = stateMachineModel.CurrentStateName,
                 IsCompleted = stateMachineModel.IsCompleted,
@@ -178,12 +185,12 @@ namespace WorkflowFacilities.Persistent
                 var dictionary = binaryFormatter.Deserialize(memoryStream) as ConcurrentDictionary<string, string>;
                 pipelineContext.LocalVariableDictionary = dictionary;
             }
-            
+
             var stateMachine = new StateMachine() {
                 Id = stateMachineModel.Id,
                 ExecuteActivityChainEntry = activity,
                 Context = pipelineContext,
-                Name = stateMachineModel.Name
+                TemplateName = stateMachineModel.Name
             };
 
             return stateMachine;

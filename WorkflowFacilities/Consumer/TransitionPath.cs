@@ -35,7 +35,7 @@ namespace WorkflowFacilities.Consumer
         /// </summary>
         public Guid Version { get; set; }
 
-        public string Name { get; set; }
+        public string DisplayName { get; set; }
     }
 
     

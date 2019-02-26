@@ -9,5 +9,10 @@
         Set = 4,
 
         Start = 8,
+
+        ParallelStart = 16,
+
+        ParallelEnd = 32,
+        
     }
 }

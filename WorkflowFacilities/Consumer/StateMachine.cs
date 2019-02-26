@@ -18,10 +18,10 @@ namespace WorkflowFacilities.Consumer
     {
         public Guid Id { get; set; }
 
-        public string Name { get; set; }
+        public string TemplateName { get; set; }
 
         public Guid Version { get; set; }
-        
+
         /// <summary>
         /// activity链
         /// </summary>
@@ -34,9 +34,6 @@ namespace WorkflowFacilities.Consumer
         internal PipelineContext Context { get; set; }
 
         internal StateMachine()
-        {
-        }
-
-
+        { }
     }
 }

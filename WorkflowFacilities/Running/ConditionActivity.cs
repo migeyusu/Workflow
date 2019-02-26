@@ -12,7 +12,7 @@ namespace WorkflowFacilities.Running
         {
             this._satisfy = satisfy;
             this.ActivityType = RunningActivityType.Condition;
-            this.Name = Conditionstring;
+            this.DisplayName = Conditionstring;
             //this.Version = Guid.Parse("5252E0F4-407B-4970-BA10-8D157E3E8BBD");
         }
 

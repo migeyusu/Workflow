@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WorkflowFacilities</RootNamespace>
     <AssemblyName>WorkflowFacilities</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -54,6 +55,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Consumer\BaseCodeActivity.cs" />
+    <Compile Include="Consumer\ParallelForeach.cs" />
+    <Compile Include="Consumer\SequenceActivity.cs" />
     <Compile Include="Consumer\StateMachine.cs" />
     <None Include="Persistent\Old\TransitionPathModel.cs" />
     <Compile Include="IWorkflowTemplateRegister.cs" />
@@ -73,8 +77,17 @@
     <Compile Include="Migrations\201902231315553_adddic.Designer.cs">
       <DependentUpon>201902231315553_adddic.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201902250337035_ChangeToDisplayName.cs" />
+    <Compile Include="Migrations\201902250337035_ChangeToDisplayName.Designer.cs">
+      <DependentUpon>201902250337035_ChangeToDisplayName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201902250707575_addsuspend.cs" />
+    <Compile Include="Migrations\201902250707575_addsuspend.Designer.cs">
+      <DependentUpon>201902250707575_addsuspend.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Persistent\StateMachineTemplateModel.cs" />
+    <Compile Include="Persistent\SuspendedRunningActivityModel.cs" />
     <Compile Include="Running\BaseExecuteActivity.cs" />
     <Compile Include="Running\ConditionActivity.cs" />
     <Compile Include="Running\CustomExecuteActivity.cs" />
@@ -85,6 +98,9 @@
     <Compile Include="IActivity.cs" />
     <Compile Include="Consumer\ICustomActivity.cs" />
     <Compile Include="Running\IRunningModel.cs" />
+    <Compile Include="Consumer\ParallelActivity.cs" />
+    <Compile Include="Running\ParallelEndActivity.cs" />
+    <Compile Include="Running\ParallelStartActivity.cs" />
     <Compile Include="Running\PipelineContext.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Consumer\State.cs" />
@@ -120,6 +136,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201902231315553_adddic.resx">
       <DependentUpon>201902231315553_adddic.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902250337035_ChangeToDisplayName.resx">
+      <DependentUpon>201902250337035_ChangeToDisplayName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201902250707575_addsuspend.resx">
+      <DependentUpon>201902250707575_addsuspend.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

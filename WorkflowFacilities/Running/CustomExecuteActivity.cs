@@ -33,7 +33,7 @@ namespace WorkflowFacilities.Running
     }*/
     public class CustomExecuteActivity : BaseExecuteActivity
     {
-        private const string Customstring = "Custom";
+        private const string CustomString = "Custom";
 
         private readonly ICustomActivity _customActivity;
 
@@ -41,8 +41,7 @@ namespace WorkflowFacilities.Running
         {
             this._customActivity = customActivity;
             this.Version = customActivity.Version;
-            this.Bookmark = customActivity.Bookmark;
-            this.Name = string.IsNullOrEmpty(customActivity.Name) ? Customstring : customActivity.Name;
+            this.DisplayName = string.IsNullOrEmpty(customActivity.DisplayName) ? CustomString : customActivity.DisplayName;
             this.ActivityType = RunningActivityType.Custom;
         }
 
@@ -51,9 +50,9 @@ namespace WorkflowFacilities.Running
             return _customActivity.Execute(context);
         }
 
-        public override void BookmarkCallback(PipelineContext context)
+        public override void BookmarkCallback(PipelineContext context, string bookmarkName, object value)
         {
-            _customActivity.BookmarkCallback(context);
+            _customActivity.BookmarkCallback(context, bookmarkName, value);
         }
     }
 }

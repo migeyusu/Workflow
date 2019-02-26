@@ -31,11 +31,11 @@ namespace ConsoleApp1
                 context.Set("Turns", turns.ToString());
                 return true;
             }), null) {Version = Guid.Parse("5AD03706-F349-4559-A8DD-FB881D0E9466")};
-            var readIntActivity = new CodeActivity((context => {
-                    context.WaitOn();
+            var readIntActivity = new CodeActivity(context => {
+                    context.WaitOn("");
                     return true;
-                }), (context => { context.Set("Guess", context.ResumingBookmark.Value.ToString()); }))
-                {Bookmark = "EnterGuess", Version = Guid.Parse("B06E8F2F-37FD-4B18-8744-55285FB4EA1B")};
+                }, (context, s, arg3) => context.Set("Guess",arg3.ToString()))
+                { Bookmark = "EnterGuess", Version = Guid.Parse("B06E8F2F-37FD-4B18-8744-55285FB4EA1B")};
 
             var activity1 = new CodeActivity((context => {
                 var s = int.Parse(context.Get("Guess"));
@@ -46,16 +46,16 @@ namespace ConsoleApp1
             CustomActivities.AddRange(new[] {codeActivity, activity, codeActivity1, readIntActivity, activity1});
 
             var initializeState = new State() {
-                Name = "Initialize Target",
+                DisplayName = "Initialize Target",
                 Entry = codeActivity,
             };
             var enterState = new State() {
-                Name = "Enter Guess",
+                DisplayName = "Enter Guess",
                 Entry = activity,
                 Exit = codeActivity1
             };
             var finalState = new State() {
-                Name = "FinalState"
+                DisplayName = "FinalState"
             };
             States.AddRange(new[] {initializeState, enterState, finalState});
 

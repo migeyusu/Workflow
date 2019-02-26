@@ -1,6 +1,9 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.Contracts;
 using System.Threading;
 using WorkflowFacilities.Consumer;
 
@@ -19,9 +22,15 @@ namespace WorkflowFacilities.Running
 
         public bool IsRunning { get; internal set; }
 
-        public bool IsWaiting { get; set; }
+        internal bool IsWaiting { get; set; }
 
-        public KeyValuePair<string,object> ResumingBookmark { get; internal set; }
+        internal string WaitingBookmark { get; set; }
+
+        /// <summary>
+        /// 用于内部activity控制
+        /// </summary>
+        internal ConcurrentDictionary<string, string> InternalVariableDictionary { get; set; } =
+            new ConcurrentDictionary<string, string>();
 
         internal ConcurrentDictionary<string, string> LocalVariableDictionary { get; set; } =
             new ConcurrentDictionary<string, string>();
@@ -39,18 +48,29 @@ namespace WorkflowFacilities.Running
             return LocalVariableDictionary.TryGetValue(name, out var value) ? value : string.Empty;
         }
 
+        public void Remove(string key)
+        {
+            LocalVariableDictionary.TryRemove(key, out var value);
+        }
+
         internal void InternalRequestHangUp(IExecuteActivity activity)
         {
-            SuspendedActivities.Add(activity.Bookmark, activity);
+            if (SuspendedActivities.ContainsKey(WaitingBookmark)) {
+                throw new DuplicateNameException("The same bookmark name!");
+            }
+            SuspendedActivities.Add(WaitingBookmark, activity);
+            IsWaiting = false;
+            WaitingBookmark = string.Empty;
         }
 
         /// <summary>
         /// 挂起当前activity,只允许单线程调用
         /// </summary>
-        /// <param name="customActivity"></param>
-        public void WaitOn()
+        /// <param name="bookmark"></param>
+        public void WaitOn(string bookmark)
         {
             IsWaiting = true;
+            WaitingBookmark = bookmark;
         }
     }
 }

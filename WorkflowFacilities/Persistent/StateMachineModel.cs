@@ -25,14 +25,21 @@ namespace WorkflowFacilities.Persistent
 
         public byte[] LocalVariousDictionary { get; set; }
 
-        public virtual List<RunningActivityModel> SuspendedActivityModels { get; set; }
+
+        //public virtual List<RunningActivityModel> SuspendedActivityModels { get; set; }
+        /*由于需要允许运行时的activity可变，所以仍然采用一次生成的固定的运行链，但是运行链包含有可以控制runningactivity链的activity*/
+        /// <summary>
+        /// 脱离固定的运行链，可以增加灵活性
+        /// </summary>
+        public virtual List<SuspendedRunningActivityModel> SuspendedRunningActivityModels { get; set; }
 
         #endregion
 
         public StateMachineModel()
         {
             //Id = Guid.NewGuid();
-            SuspendedActivityModels = new List<RunningActivityModel>();
+//            SuspendedActivityModels = new List<RunningActivityModel>();
+            SuspendedRunningActivityModels = new List<SuspendedRunningActivityModel>();
         }
     }
 }

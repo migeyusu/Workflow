@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WorkflowFacilities;
+using WorkflowFacilities.Consumer;
 using WorkflowFacilities.Persistent;
 using WorkflowFacilities.Running;
 
@@ -19,7 +20,7 @@ namespace ConsoleApp1
         static void Main(string[] args)
         {
             new WorkflowFact().Register<NumberguessTemplate>();
-
+            
            //StateMachine stateMachine;
            // using (var openField = WorkflowFact.OpenField("WorkflowDb")) {
            //     openField.CheckUpdates();
@@ -68,8 +69,10 @@ namespace ConsoleApp1
   
             Console.ReadKey();
         }
+    }
 
-
-
+    public class New:BaseCodeActivity
+    {
+        
     }
 }

@@ -15,7 +15,7 @@ namespace WorkflowFacilities.Running
 
         private readonly StateMachine _stateMachine;
 
-        private PipelineContext _context;
+        private readonly PipelineContext _context;
 
         public StateMachineScheduler(StateMachine stateMachine)
         {
@@ -40,74 +40,8 @@ namespace WorkflowFacilities.Running
         {
             var activitiesMapping = new Dictionary<State, IExecuteActivity>();
             var startActivity = new StartActiviy();
-            InternalTranslate(stateMachine.StartState, startActivity, activitiesMapping);
+            stateMachine.StartState.InternalTranslate(startActivity, activitiesMapping);
             return startActivity;
-        }
-
-        private static void InternalTranslate(State state, IExecuteActivity executeActivity,
-            IDictionary<State, IExecuteActivity> mapping)
-        {
-            var activity = executeActivity;
-            var stateEmptyExecuteActivity = new StateSetExecuteActivity {
-                Name = state.Name
-            };
-            mapping.Add(state, stateEmptyExecuteActivity);
-            activity.NextActivities.Add(stateEmptyExecuteActivity);
-            activity = stateEmptyExecuteActivity;
-            var entry = state.Entry;
-            if (entry != null) {
-                var customExecuteActivity = new CustomExecuteActivity(entry) {
-                    Version = entry.Version,
-                    Bookmark = entry.Bookmark,
-                    Name = entry.Name
-                };
-                activity.NextActivities.Add(customExecuteActivity);
-                activity = customExecuteActivity;
-            }
-
-            var exit = state.Exit;
-            if (exit != null) {
-                var customExecuteActivity = new CustomExecuteActivity(exit);
-                activity.NextActivities.Add(customExecuteActivity);
-                activity = customExecuteActivity;
-            }
-
-            foreach (var transition in state.Transitions) {
-                var endActivity = activity;
-                var trigger = transition.Trigger;
-                if (trigger != null) {
-                    var customExecuteActivity = new CustomExecuteActivity(trigger);
-                    endActivity.NextActivities.Add(customExecuteActivity);
-                    endActivity = customExecuteActivity;
-                }
-
-                foreach (var path in transition.TransitionPaths) {
-                    var pathConditionFunc = path.ConditionFunc;
-                    var pathactivity = endActivity;
-                    if (pathConditionFunc != null) {
-                        var conditionActivity = new ConditionActivity(pathConditionFunc) {
-                            Version = path.Version
-                        };
-                        pathactivity.NextActivities.Add(conditionActivity);
-                        pathactivity = conditionActivity;
-                    }
-
-                    var aciton = path.Aciton;
-                    if (aciton != null) {
-                        var customExecuteActivity = new CustomExecuteActivity(aciton);
-                        pathactivity.NextActivities.Add(customExecuteActivity);
-                        pathactivity = customExecuteActivity;
-                    }
-
-                    var pathTo = path.To;
-                    if (mapping.TryGetValue(pathTo, out IExecuteActivity nextExecuteActivity)) {
-                        pathactivity.NextActivities.Add(nextExecuteActivity);
-                    }
-                    else {
-                        InternalTranslate(pathTo, pathactivity, mapping);
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -120,27 +54,19 @@ namespace WorkflowFacilities.Running
                 throw new ArgumentException("不能运行已经结束的statemachine！");
             }
 
-            //first run
-            if (!_context.IsRunning) {
-                if (dictionary != null)
-                    foreach (var pair in dictionary) {
-                        _context.LocalVariableDictionary.TryAdd(pair.Key, pair.Value);
-                    }
-
-                InternalRun(_stateMachine.ExecuteActivityChainEntry, _stateMachine.Context);
-                _context.IsRunning = true;
+            //only for first run
+            if (_context.IsRunning) {
+                return;
             }
-            else {
-                var executeActivities = _context.SuspendedActivities.Values.Select(activity => {
-                    //因为从持久化中恢复的activity会没有该标志位，需要手动添加，同内部会移除suspendactivity
-                    activity.IsHangUped = true;
-                    return activity;
-                }).ToList();
-                foreach (var executeActivity in executeActivities) {
-                    InternalRun(executeActivity, _context);
+
+            if (dictionary != null) {
+                foreach (var pair in dictionary) {
+                    _context.LocalVariableDictionary.TryAdd(pair.Key, pair.Value);
                 }
             }
 
+            InternalRun(_stateMachine.ExecuteActivityChainEntry, _stateMachine.Context);
+            _context.IsRunning = true;
             if (_context.IsCompleted) {
                 _context.IsRunning = false;
                 this.RiseCompleted();
@@ -153,24 +79,15 @@ namespace WorkflowFacilities.Running
 
         private void InternalRun(IExecuteActivity activity, PipelineContext context)
         {
-            if (activity.IsHangUped && activity.Bookmark != null &&
-                context.ResumingBookmark.Key == activity.Bookmark) {
-                activity.BookmarkCallback(context);
-                context.ResumingBookmark = new KeyValuePair<string, object>();
-                activity.IsHangUped = false;
-                context.SuspendedActivities.Remove(activity.Bookmark);
+            var execute = activity.Execute(context);
+            if (!execute) {
+                return;
             }
-            else {
-                var execute = activity.Execute(context);
-                if (!execute) {
-                    return;
-                }
 
-                if (context.IsWaiting) {
-                    context.InternalRequestHangUp(activity);
-                    context.IsWaiting = false;
-                    return;
-                }
+            if (context.IsWaiting) {
+                context.InternalRequestHangUp(activity);
+                context.IsWaiting = false;
+                return;
             }
 
             //end
@@ -184,10 +101,19 @@ namespace WorkflowFacilities.Running
             }
         }
 
-        public void ResumeBookmark(string name, string value)
+        public void ResumeBookmark(string bookmark, object value)
         {
-            _context.ResumingBookmark = new KeyValuePair<string, object>(name, value);
-            Run();
+            if (string.IsNullOrEmpty(bookmark)) {
+                throw new ArgumentNullException("bookmark不允许为空");
+            }
+
+            if (_context.SuspendedActivities.TryGetValue(bookmark, out IExecuteActivity executeActivity)) {
+                executeActivity.BookmarkCallback(_context, bookmark, value);
+                _context.SuspendedActivities.Remove(bookmark);
+                foreach (var nextActivity in executeActivity.NextActivities) {
+                    InternalRun(nextActivity, _context);
+                }
+            }
         }
 
         internal static IExecuteActivity Deserialize(RunningActivityModel activityModel,
@@ -216,13 +142,12 @@ namespace WorkflowFacilities.Running
                     executeActivity =
                         new CustomExecuteActivity(customActivity) {
                             Version = activityModel.Version,
-                            Bookmark = activityModel.Bookmark,
-                            Name = activityModel.Name,
+                            DisplayName = activityModel.DisplayName,
                         };
                     break;
                 case RunningActivityType.Set:
                     executeActivity = new StateSetExecuteActivity() {
-                        Name = activityModel.Name,
+                        DisplayName = activityModel.DisplayName,
                     };
                     break;
                 case RunningActivityType.Start:
@@ -250,8 +175,7 @@ namespace WorkflowFacilities.Running
         {
             var activityModel = new RunningActivityModel {
                 Version = executeActivity.Version,
-                Name = executeActivity.Name,
-                Bookmark = executeActivity.Bookmark,
+                DisplayName = executeActivity.DisplayName,
                 Id = executeActivity.Id,
                 ActivityType = executeActivity.ActivityType,
             };

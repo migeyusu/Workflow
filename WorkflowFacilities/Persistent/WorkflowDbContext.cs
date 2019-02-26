@@ -33,7 +33,8 @@ namespace WorkflowFacilities.Persistent
             modelBuilder.Entity<RunningActivityModel>()
                 .HasMany((s) => s.RunningActivityModels)
                 .WithMany();
-            base.OnModelCreating(modelBuilder);
+            
+            base.OnModelCreating(modelBuilder); 
             
         }
 
@@ -43,5 +44,7 @@ namespace WorkflowFacilities.Persistent
         public DbSet<RunningActivityModel> ActivityModels { get; set; }
 
         public DbSet<StateMachineTemplateModel> StateMachineTemplateModels { get; set; }
+
+        public DbSet<SuspendedRunningActivityModel> SuspendedRunningActivityModels { get; set; }
     }
 }

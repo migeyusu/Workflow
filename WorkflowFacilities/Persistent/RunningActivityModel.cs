@@ -18,7 +18,7 @@ namespace WorkflowFacilities.Persistent
         /// </summary>
         public Guid Version { get; set; }
 
-        public string Name { get; set; }
+        public string DisplayName { get; set; }
 
         public string Bookmark { get; set; }
 

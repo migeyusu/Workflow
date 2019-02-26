@@ -14,7 +14,7 @@ namespace WorkflowFacilities.Running
 
         public RunningActivityType ActivityType { get; set; }
 
-        public string Name { get; set; }
+        public string DisplayName { get; set; }
 
         public string Bookmark { get; set; }
 
@@ -29,7 +29,7 @@ namespace WorkflowFacilities.Running
             return true;
         }
 
-        public virtual void BookmarkCallback(PipelineContext context)
+        public virtual void BookmarkCallback(PipelineContext context, string bookmarkName, object value)
         {
             throw new NotImplementedException();
         }
